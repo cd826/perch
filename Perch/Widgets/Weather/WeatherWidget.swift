@@ -5,6 +5,8 @@ import SwiftUI
 /// §14–17). Renders every SPEC §22 situation — permission prompt,
 /// setup guidance, failure with last-updated time — and the live
 /// snapshot in a wide (2-column) or compact (1-column) layout.
+/// Content fills the square card: info block pinned to the top,
+/// hourly strip pinned to the bottom, flexible space between.
 struct WeatherWidget: DashboardWidget {
     @StateObject private var viewModel = WeatherViewModel()
 
@@ -17,17 +19,17 @@ struct WeatherWidget: DashboardWidget {
     }
 
     var body: some View {
-        ScrollView(.vertical) {
-            VStack(alignment: .leading, spacing: Spacing.small) {
-                header
-                // Compressible body: the card must never stretch beyond
-                // its square row, whatever the content's minimum height.
-                detail
+        GeometryReader { geo in
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: Spacing.small) {
+                    header
+                    stateContent
+                    Spacer(minLength: 0)
+                }
+                .frame(maxWidth: .infinity, minHeight: geo.size.height, alignment: .topLeading)
             }
-            .frame(maxWidth: .infinity, alignment: .topLeading)
+            .scrollIndicators(.never)
         }
-        .scrollIndicators(.never)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
     }
@@ -48,7 +50,7 @@ struct WeatherWidget: DashboardWidget {
 
     // MARK: - Body per state
 
-    @ViewBuilder private var detail: some View {
+    @ViewBuilder private var stateContent: some View {
         switch viewModel.state {
         case .loading:
             ProgressView()
@@ -91,81 +93,91 @@ struct WeatherWidget: DashboardWidget {
             }
 
         case .loaded(let snapshot, let staleNotice):
-            if columnSpan >= WidgetColumnSpan.double {
-                wideLayout(snapshot)
-            } else {
-                compactLayout(snapshot)
-            }
-            if let staleNotice {
-                Text(staleNotice)
-                    .font(Typography.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+            let isWide = columnSpan >= WidgetColumnSpan.double
+            VStack(alignment: .leading, spacing: Spacing.small) {
+                if let staleNotice {
+                    Text(staleNotice)
+                        .font(Typography.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+                if isWide {
+                    wideTop(snapshot)
+                } else {
+                    compactTop(snapshot)
+                }
+                Spacer(minLength: 0)
+                hourlyStrip(Array(snapshot.hourly.prefix(isWide ? 6 : 3)))
             }
         }
     }
 
     // MARK: - Data layouts
 
-    /// Two-column layout modeled on the macOS weather widget: city,
-    /// condition and range on the left, oversized temperature on the
-    /// right, a three-row hourly strip along the bottom.
-    private func wideLayout(_ snapshot: WeatherSnapshot) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top, spacing: Spacing.medium) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(snapshot.city)
-                        .font(Typography.widgetTitle)
-                    HStack(spacing: 6) {
-                        Image(systemName: snapshot.symbolName)
-                            .font(.system(size: 15))
-                            .foregroundStyle(.primary)
-                        Text(snapshot.condition)
-                            .font(Typography.body)
-                    }
-                    HStack(spacing: 6) {
-                        rangeText("最高", snapshot.high)
-                        rangeText("最低", snapshot.low)
-                    }
+    /// Two-column top section modeled on the macOS weather widget:
+    /// city, condition and range on the left, oversized temperature
+    /// pinned to the top-right corner.
+    private func wideTop(_ snapshot: WeatherSnapshot) -> some View {
+        HStack(alignment: .top, spacing: Spacing.medium) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(snapshot.city)
+                    .font(Typography.widgetTitle)
+                HStack(spacing: 6) {
+                    Image(systemName: snapshot.symbolName)
+                        .font(.system(size: 15))
+                        .foregroundStyle(.primary)
+                    Text(snapshot.condition)
+                        .font(Typography.body)
                 }
-                Spacer(minLength: 0)
-                Text("\(snapshot.temperature)°")
-                    .font(Typography.temperatureLarge)
+                HStack(spacing: 8) {
+                    rangeText("最高", snapshot.high)
+                    rangeText("最低", snapshot.low)
+                }
             }
-            hourlyStrip(Array(snapshot.hourly.prefix(6)))
+            Spacer(minLength: 0)
+            Text("\(snapshot.temperature)°")
+                .font(Typography.temperatureLarge)
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
-    /// One-column layout for narrow cards, stacked top to bottom:
-    /// city / icon+condition with temperature top-right / high-low
-    /// ranges / three-hour strip.
-    private func compactLayout(_ snapshot: WeatherSnapshot) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .top, spacing: Spacing.small) {
-                VStack(alignment: .leading, spacing: 4) {
+    /// One-column top section: city with condition on the left,
+    /// temperature on the right, high/low arrows below.
+    private func compactTop(_ snapshot: WeatherSnapshot) -> some View {
+        HStack(alignment: .top, spacing: Spacing.small) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 4) {
                     Text(snapshot.city)
                         .font(Typography.widgetTitle)
                         .lineLimit(1)
-                    HStack(spacing: 4) {
-                        Image(systemName: snapshot.symbolName)
-                            .font(.system(size: 13))
-                            .foregroundStyle(.primary)
-                        Text(snapshot.condition)
-                            .font(Typography.body)
-                    }
+                    Image(systemName: snapshot.symbolName)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.primary)
+                    Text(snapshot.condition)
+                        .font(Typography.caption)
                 }
-                Spacer(minLength: 0)
-                Text("\(snapshot.temperature)°")
-                    .font(Typography.temperatureCompact)
+                HStack(spacing: 8) {
+                    rangeItem("arrow.up", snapshot.high)
+                    rangeItem("arrow.down", snapshot.low)
+                }
             }
-            HStack(spacing: 8) {
-                rangeText("最高", snapshot.high)
-                rangeText("最低", snapshot.low)
-            }
-            hourlyStrip(itemCount: 3, from: snapshot.hourly)
+            Spacer(minLength: 0)
+            Text("\(snapshot.temperature)°")
+                .font(Typography.temperatureCompact)
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
+    }
+
+    /// "最高32°"-style readout on a single line.
+    private func rangeText(_ label: String, _ value: Int) -> some View {
+        HStack(spacing: 2) {
+            Text(label)
+                .font(Typography.caption)
+                .foregroundStyle(.secondary)
+            Text("\(value)°")
+                .font(Typography.caption)
+                .monospacedDigit()
+        }
     }
 
     private func rangeItem(_ symbol: String, _ value: Int) -> some View {
@@ -179,21 +191,12 @@ struct WeatherWidget: DashboardWidget {
         }
     }
 
-    /// "最高33°"-style readout used beside the current temperature.
-    private func rangeText(_ label: String, _ value: Int) -> some View {
-        HStack(spacing: 2) {
-            Text(label)
-                .font(Typography.caption)
-                .foregroundStyle(.secondary)
-            Text("\(value)°")
-                .font(Typography.caption)
-                .monospacedDigit()
-        }
-    }
-
+    /// Hourly strip whose columns spread across the full width: the
+    /// first hugs the left edge, the last hugs the right edge.
     private func hourlyStrip(_ entries: [WeatherSnapshot.HourEntry]) -> some View {
-        HStack(spacing: Spacing.small) {
-            ForEach(entries) { entry in
+        let count = entries.count
+        return HStack(spacing: 0) {
+            ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
                 VStack(spacing: 3) {
                     Text("\(entry.hour)时")
                         .font(Typography.caption)
@@ -208,7 +211,8 @@ struct WeatherWidget: DashboardWidget {
                         .monospacedDigit()
                         .lineLimit(1)
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity,
+                       alignment: index == 0 ? .leading : (index == count - 1 ? .trailing : .center))
             }
         }
     }
