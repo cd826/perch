@@ -9,6 +9,11 @@ import SwiftUI
 struct WindowConfigurator: NSViewRepresentable {
     private static let frameAutosaveName = "Perch.MainWindow"
 
+    /// Weak ref to the dashboard window, set once the view lands in
+    /// it — the menu-bar toggle uses this instead of searching
+    /// NSApp.windows by identifier (unreliable under SwiftUI).
+    static weak var dashboardWindow: NSWindow?
+
     func makeNSView(context: Context) -> NSView {
         ChromeApplyingView(frameAutosaveName: Self.frameAutosaveName)
     }
@@ -35,6 +40,8 @@ private final class ChromeApplyingView: NSView {
         super.viewDidMoveToWindow()
         guard let window, !didConfigure else { return }
         didConfigure = true
+
+        WindowConfigurator.dashboardWindow = window
 
         // Title-bar chrome itself comes from .windowStyle(.hiddenTitleBar)
         // on the scene; this hook handles the parts SwiftUI does not

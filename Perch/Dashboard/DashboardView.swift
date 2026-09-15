@@ -7,6 +7,14 @@ import SwiftUI
 /// rebuilds the configuration and animates the grid reflow (SPEC §12).
 struct DashboardView: View {
     @AppStorage(ConfigurationStore.clockStyleKey) private var clockStyle: ClockStyle = .analog
+    @Environment(\.openSettings) private var openSettings
+
+    /// Menu-bar apps have no app menu: the status item's "设置…"
+    /// action posts this notification, bridged here into SwiftUI's
+    /// openSettings.
+    private var settingsObserver: NotificationCenter.Publisher {
+        NotificationCenter.default.publisher(for: AppDelegate.openSettingsNotification)
+    }
 
     private var configuration: DashboardConfiguration {
         DashboardConfiguration(clockStyle: clockStyle)
@@ -25,5 +33,8 @@ struct DashboardView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
         .animation(.smooth(duration: 0.35), value: clockStyle)
+        .onReceive(settingsObserver) { _ in
+            openSettings()
+        }
     }
 }

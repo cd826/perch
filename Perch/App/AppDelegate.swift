@@ -62,6 +62,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private var dashboardWindow: NSWindow? {
-        NSApp.windows.first { $0.identifier?.rawValue == AppDelegate.dashboardWindowID }
+        WindowConfigurator.dashboardWindow
     }
 }
