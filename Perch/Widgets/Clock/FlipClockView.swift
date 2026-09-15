@@ -105,6 +105,7 @@ private struct FlipDigitView: View {
             }
         }
         .frame(width: size.width, height: size.height)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .onChange(of: digit) { _, newValue in
             guard !isAnimating else {
                 upper = newValue
