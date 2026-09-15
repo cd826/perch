@@ -48,11 +48,11 @@ private struct ClockFace: View {
                 ForEach(1...12, id: \.self) { hour in
                     let radians = Double(hour) * 30 / 180 * .pi - .pi / 2
                     Text("\(hour)")
-                        .font(.system(size: face * 0.155, weight: .medium, design: .rounded))
+                        .font(.system(size: face * 0.142, weight: .medium))
                         .foregroundStyle(.black)
                         .offset(
-                            x: cos(radians) * face * 0.36,
-                            y: sin(radians) * face * 0.36
+                            x: cos(radians) * face * 0.325,
+                            y: sin(radians) * face * 0.325
                         )
                 }
 
