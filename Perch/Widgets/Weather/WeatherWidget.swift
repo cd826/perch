@@ -116,18 +116,19 @@ struct WeatherWidget: DashboardWidget {
 
     /// Two-column top section modeled on the macOS weather widget:
     /// city, condition and range on the left, oversized temperature
-    /// pinned to the top-right corner.
+    /// pinned to the top-right corner. Every line is left-aligned to
+    /// the city name.
     private func wideTop(_ snapshot: WeatherSnapshot) -> some View {
         HStack(alignment: .top, spacing: Spacing.medium) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(snapshot.city)
                     .font(Typography.widgetTitle)
                 HStack(spacing: 6) {
+                    Text(snapshot.condition)
+                        .font(Typography.body)
                     Image(systemName: snapshot.symbolName)
                         .font(.system(size: 15))
                         .foregroundStyle(.primary)
-                    Text(snapshot.condition)
-                        .font(Typography.body)
                 }
                 HStack(spacing: 8) {
                     rangeText("最高", snapshot.high)
@@ -146,15 +147,15 @@ struct WeatherWidget: DashboardWidget {
     private func compactTop(_ snapshot: WeatherSnapshot) -> some View {
         HStack(alignment: .top, spacing: Spacing.small) {
             VStack(alignment: .leading, spacing: 6) {
+                Text(snapshot.city)
+                    .font(Typography.widgetTitle)
+                    .lineLimit(1)
                 HStack(spacing: 4) {
-                    Text(snapshot.city)
-                        .font(Typography.widgetTitle)
-                        .lineLimit(1)
+                    Text(snapshot.condition)
+                        .font(Typography.caption)
                     Image(systemName: snapshot.symbolName)
                         .font(.system(size: 12))
                         .foregroundStyle(.primary)
-                    Text(snapshot.condition)
-                        .font(Typography.caption)
                 }
                 HStack(spacing: 8) {
                     rangeItem("arrow.up", snapshot.high)
@@ -191,13 +192,13 @@ struct WeatherWidget: DashboardWidget {
         }
     }
 
-    /// Hourly strip whose columns spread across the full width: the
-    /// first hugs the left edge, the last hugs the right edge.
+    /// Hourly strip: equal-width columns, each left-aligned, so the
+    /// first hour lines up with the city name and the gaps between
+    /// columns stay consistent.
     private func hourlyStrip(_ entries: [WeatherSnapshot.HourEntry]) -> some View {
-        let count = entries.count
-        return HStack(spacing: 0) {
-            ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
-                VStack(spacing: 3) {
+        HStack(spacing: 0) {
+            ForEach(entries) { entry in
+                VStack(alignment: .leading, spacing: 3) {
                     Text("\(entry.hour)时")
                         .font(Typography.caption)
                         .foregroundStyle(.secondary)
@@ -211,8 +212,7 @@ struct WeatherWidget: DashboardWidget {
                         .monospacedDigit()
                         .lineLimit(1)
                 }
-                .frame(maxWidth: .infinity,
-                       alignment: index == 0 ? .leading : (index == count - 1 ? .trailing : .center))
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }
