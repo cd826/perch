@@ -7,7 +7,7 @@ struct PerchApp: App {
             DashboardView()
                 .frame(
                     minWidth: DashboardLayout.minimumWindowWidth,
-                    minHeight: DashboardLayout.minimumWindowHeight
+                    minHeight: DashboardLayout.minimumWindowHeight - DashboardLayout.titleBarAllowance
                 )
                 .background(WindowConfigurator())
         }

@@ -38,8 +38,17 @@ private final class ChromeApplyingView: NSView {
 
         // Title-bar chrome itself comes from .windowStyle(.hiddenTitleBar)
         // on the scene; this hook handles the parts SwiftUI does not
-        // expose (frame autosaving, background dragging).
+        // expose (precise minimum size, frame autosaving, dragging).
         window.isMovableByWindowBackground = true
+        // SwiftUI's contentMinSize double-counts the hidden titlebar
+        // (28pt) on full-size-content windows, making the minimum
+        // window taller than the content and the vertical gaps larger
+        // than the horizontal ones. Set the window minimum directly.
+        window.contentMinSize = .zero
+        window.minSize = NSSize(
+            width: DashboardLayout.minimumWindowWidth,
+            height: DashboardLayout.minimumWindowHeight
+        )
 
         window.setFrameAutosaveName(frameAutosaveName)
         if !window.setFrameUsingName(frameAutosaveName) {

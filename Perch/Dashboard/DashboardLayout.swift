@@ -11,6 +11,10 @@ enum DashboardLayout {
     static let minimumColumnWidth: CGFloat = 176
     /// Column width the default window size targets.
     static let defaultColumnWidth: CGFloat = 300
+    /// Height the hidden titlebar still adds to the window frame.
+    /// SwiftUI's contentMinSize double-counts it on full-size-content
+    /// windows, so the SwiftUI content minimum subtracts it.
+    static let titleBarAllowance: CGFloat = 28
 
     static var minimumWindowWidth: CGFloat {
         windowWidth(forGridWidth: gridWidth(columnCount: columnCount, columnWidth: minimumColumnWidth))
