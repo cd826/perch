@@ -142,29 +142,29 @@ struct WeatherWidget: DashboardWidget {
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
-    /// One-column top section: city with condition on the left,
-    /// temperature on the right, high/low arrows below.
+    /// One-column top section: city and temperature share the first
+    /// row; condition and high/low get full-width rows below.
     private func compactTop(_ snapshot: WeatherSnapshot) -> some View {
-        HStack(alignment: .top, spacing: Spacing.small) {
-            VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
                 Text(snapshot.city)
                     .font(Typography.widgetTitle)
                     .lineLimit(1)
-                HStack(spacing: 4) {
-                    Text(snapshot.condition)
-                        .font(Typography.caption)
-                    Image(systemName: snapshot.symbolName)
-                        .font(.system(size: 12))
-                        .foregroundStyle(.primary)
-                }
-                HStack(spacing: 8) {
-                    rangeItem("arrow.up", snapshot.high)
-                    rangeItem("arrow.down", snapshot.low)
-                }
+                Spacer(minLength: Spacing.small)
+                Text("\(snapshot.temperature)°")
+                    .font(Typography.temperatureCompact)
             }
-            Spacer(minLength: 0)
-            Text("\(snapshot.temperature)°")
-                .font(Typography.temperatureCompact)
+            HStack(spacing: 4) {
+                Text(snapshot.condition)
+                    .font(Typography.body)
+                Image(systemName: snapshot.symbolName)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.primary)
+            }
+            HStack(spacing: 8) {
+                rangeItem("arrow.up", snapshot.high)
+                rangeItem("arrow.down", snapshot.low)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
