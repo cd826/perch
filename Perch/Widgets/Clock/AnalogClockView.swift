@@ -1,9 +1,10 @@
 import SwiftUI
 
-/// Analog clock face (SPEC §10): hour/minute/second hands plus 12
-/// hour markers on a minimal circular face that scales with the card.
-/// The second hand sweeps smoothly; TimelineView(.animation) drives
-/// it and SwiftUI stops it whenever the view is not on screen.
+/// Analog clock face styled after the macOS clock widget (SPEC §10):
+/// a white dial with black numerals and minute ticks, bold black
+/// hour/minute hands and an orange second hand with a tail. The
+/// second hand sweeps smoothly; TimelineView(.animation) drives it
+/// and SwiftUI stops it whenever the view is not on screen.
 struct AnalogClockView: View {
     var body: some View {
         TimelineView(.animation) { timeline in
@@ -20,50 +21,65 @@ private struct ClockFace: View {
     var body: some View {
         GeometryReader { proxy in
             let dim = min(proxy.size.width, proxy.size.height)
+            let face = dim * 0.98
             let angles = handAngles(for: date)
 
             ZStack {
                 Circle()
-                    .strokeBorder(Color.primary.opacity(0.15), lineWidth: max(dim * 0.012, 1.5))
+                    .fill(Color.white)
+                    .frame(width: face, height: face)
+                    .shadow(color: .black.opacity(0.18), radius: face * 0.012, y: face * 0.006)
+                    .overlay {
+                        Circle().strokeBorder(Color.black.opacity(0.08), lineWidth: 0.5)
+                    }
 
-                ForEach(0..<12, id: \.self) { index in
-                    let major = index.isMultiple(of: 3)
+                ForEach(0..<60, id: \.self) { index in
+                    let major = index.isMultiple(of: 5)
                     Capsule()
+                        .fill(Color.black.opacity(major ? 0.8 : 0.45))
                         .frame(
-                            width: max(dim * (major ? 0.018 : 0.009), 1.5),
-                            height: dim * (major ? 0.075 : 0.045)
+                            width: max(face * (major ? 0.011 : 0.005), 1),
+                            height: face * (major ? 0.045 : 0.03)
                         )
-                        .foregroundStyle(.secondary.opacity(major ? 1 : 0.6))
-                        .offset(y: -dim * 0.425)
-                        .rotationEffect(.degrees(Double(index) * 30))
+                        .offset(y: -face * 0.462)
+                        .rotationEffect(.degrees(Double(index) * 6))
+                }
+
+                ForEach(1...12, id: \.self) { hour in
+                    let radians = Double(hour) * 30 / 180 * .pi - .pi / 2
+                    Text("\(hour)")
+                        .font(.system(size: face * 0.155, weight: .medium, design: .rounded))
+                        .foregroundStyle(.black)
+                        .offset(
+                            x: cos(radians) * face * 0.36,
+                            y: sin(radians) * face * 0.36
+                        )
                 }
 
                 Hand(
-                    length: dim * 0.24, width: dim * 0.042, tail: dim * 0.04,
-                    angle: angles.hour, color: .primary
+                    length: face * 0.225, width: face * 0.05, tail: face * 0.02,
+                    angle: angles.hour, color: .black
                 )
                 Hand(
-                    length: dim * 0.36, width: dim * 0.030, tail: dim * 0.06,
-                    angle: angles.minute, color: .primary
+                    length: face * 0.33, width: face * 0.04, tail: face * 0.03,
+                    angle: angles.minute, color: .black
                 )
                 Hand(
-                    length: dim * 0.40, width: dim * 0.012, tail: dim * 0.10,
-                    angle: angles.second, color: .accentColor
+                    length: face * 0.40, width: face * 0.013, tail: face * 0.11,
+                    angle: angles.second, color: .orange
                 )
 
                 Circle()
-                    .frame(width: dim * 0.045)
-                    .foregroundStyle(.tint)
+                    .fill(Color.orange)
+                    .frame(width: face * 0.062)
                 Circle()
-                    .frame(width: dim * 0.018)
-                    .foregroundStyle(colorScheme == .dark ? .black : .white)
+                    .fill(Color.white)
+                    .frame(width: face * 0.026)
             }
             .frame(width: dim, height: dim)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
-
-    @Environment(\.colorScheme) private var colorScheme
 
     private func handAngles(for date: Date) -> (hour: Double, minute: Double, second: Double) {
         let components = Calendar.current.dateComponents(
