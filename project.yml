@@ -24,6 +24,7 @@ targets:
         CURRENT_PROJECT_VERSION: 1
         GENERATE_INFOPLIST_FILE: true
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        INFOPLIST_KEY_NSRemindersFullAccessUsageDescription: "Perch 在仪表盘上显示你的提醒事项待办。"
         CODE_SIGN_STYLE: Automatic
         CODE_SIGN_IDENTITY: "-"
         ENABLE_HARDENED_RUNTIME: true

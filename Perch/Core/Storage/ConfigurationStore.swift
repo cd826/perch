@@ -4,4 +4,5 @@ import Foundation
 /// V0.1 stores everything in UserDefaults via @AppStorage — no database.
 enum ConfigurationStore {
     static let clockStyleKey = "perch.clockStyle"
+    static let todoListIDKey = "perch.todoListID"
 }

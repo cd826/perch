@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		01B23A343234A8CEF923448F /* DashboardCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09A9266FEDB78BAD64775B52 /* DashboardCard.swift */; };
+		087DDD95779CB4EED0E65FDD /* TodoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0809DCED02F8D78BB3DAA40A /* TodoViewModel.swift */; };
 		0B02A862A8CF37E76673AC1A /* WidgetGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE426E811311DDDBAD60987 /* WidgetGrid.swift */; };
 		19011216E650F7E6E16BFC6B /* PerchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A273FDF288DDD755E9D97E33 /* PerchApp.swift */; };
 		36B49EDC618901AC32F3B044 /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB3C07B5864A91B76FAE50F /* Spacing.swift */; };
@@ -19,6 +20,7 @@
 		7FC300A76D5BCC4D722BA7C7 /* DashboardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1B046A5709102D7D94DAD9 /* DashboardConfiguration.swift */; };
 		86494F30F3083CD7B195D8B1 /* WeatherWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347CCCA5975EDF4BCCF9A386 /* WeatherWidget.swift */; };
 		A49974E38CA15546A26136E7 /* WidgetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0BA272BB60B00A901336D3 /* WidgetModel.swift */; };
+		B4E5DC469A07F9ABB45C4DF9 /* ReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BB769609F968E535E4A7CC2 /* ReminderService.swift */; };
 		B5905AC192840F4C5548F77E /* AnalogClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEE536C3209FEE236EBA2EF /* AnalogClockView.swift */; };
 		B7A564E86FC46E8EE44038A1 /* ClockStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF8FCE4C8725F4CB908D472 /* ClockStyle.swift */; };
 		BE9B5F4A36FCD419F68D5662 /* FlipClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1E2475A66E34F8042EAA4 /* FlipClockView.swift */; };
@@ -32,6 +34,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0809DCED02F8D78BB3DAA40A /* TodoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoViewModel.swift; sourceTree = "<group>"; };
 		09A9266FEDB78BAD64775B52 /* DashboardCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardCard.swift; sourceTree = "<group>"; };
 		0FE426E811311DDDBAD60987 /* WidgetGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetGrid.swift; sourceTree = "<group>"; };
 		23D57F1D420BA3985AA1AFFD /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
@@ -39,6 +42,7 @@
 		2CB3C07B5864A91B76FAE50F /* Spacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
 		2D0BA272BB60B00A901336D3 /* WidgetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetModel.swift; sourceTree = "<group>"; };
 		347CCCA5975EDF4BCCF9A386 /* WeatherWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherWidget.swift; sourceTree = "<group>"; };
+		3BB769609F968E535E4A7CC2 /* ReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderService.swift; sourceTree = "<group>"; };
 		3BF8FCE4C8725F4CB908D472 /* ClockStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockStyle.swift; sourceTree = "<group>"; };
 		427AB4A7A61643B6549459FD /* WidgetContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetContainer.swift; sourceTree = "<group>"; };
 		6D6D5E5827CD5D727398261F /* ClockWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockWidget.swift; sourceTree = "<group>"; };
@@ -69,6 +73,7 @@
 		280C413E01C03B8FCC4FBF22 /* Todo */ = {
 			isa = PBXGroup;
 			children = (
+				0809DCED02F8D78BB3DAA40A /* TodoViewModel.swift */,
 				85A317DEDDEB9EB0545555D5 /* TodoWidget.swift */,
 			);
 			path = Todo;
@@ -90,6 +95,14 @@
 				C7A007730FD780D6F7E19F17 /* Weather */,
 			);
 			path = Widgets;
+			sourceTree = "<group>";
+		};
+		36D34DB05382C170BBC78B2D /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				3BB769609F968E535E4A7CC2 /* ReminderService.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		3AD5E75B8DF3B39830B4A33D /* DesignSystem */ = {
@@ -136,6 +149,7 @@
 			isa = PBXGroup;
 			children = (
 				84D29FAAAC8075D7CD7B7E1E /* Models */,
+				36D34DB05382C170BBC78B2D /* Services */,
 				08DB55E74A3838BFE03C70E2 /* Storage */,
 			);
 			path = Core;
@@ -273,7 +287,9 @@
 				BE9B5F4A36FCD419F68D5662 /* FlipClockView.swift in Sources */,
 				19011216E650F7E6E16BFC6B /* PerchApp.swift in Sources */,
 				3A6CDE6F0972CC4BAABE4DAD /* PerchSettingsView.swift in Sources */,
+				B4E5DC469A07F9ABB45C4DF9 /* ReminderService.swift in Sources */,
 				36B49EDC618901AC32F3B044 /* Spacing.swift in Sources */,
+				087DDD95779CB4EED0E65FDD /* TodoViewModel.swift in Sources */,
 				DF0DE80B702401A43C683A16 /* TodoWidget.swift in Sources */,
 				E595C325C6E0416966EC9306 /* Typography.swift in Sources */,
 				86494F30F3083CD7B195D8B1 /* WeatherWidget.swift in Sources */,
@@ -356,6 +372,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "Perch 在仪表盘上显示你的提醒事项待办。";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -442,6 +459,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "Perch 在仪表盘上显示你的提醒事项待办。";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
