@@ -72,8 +72,11 @@ private struct FlipDigitView: View {
 
     var body: some View {
         ZStack {
-            HalfDigit(text: upper, half: .top, cardSize: size)
-            HalfDigit(text: lower, half: .bottom, cardSize: size)
+            // Static card: top half on top, bottom half below.
+            VStack(spacing: 0) {
+                HalfDigit(text: upper, half: .top, cardSize: size)
+                HalfDigit(text: lower, half: .bottom, cardSize: size)
+            }
             if isAnimating {
                 // New digit's bottom half, starting flipped up out of
                 // view (180°) and falling back onto the lower half.
@@ -84,6 +87,7 @@ private struct FlipDigitView: View {
                         anchor: .top,
                         perspective: 0.5
                     )
+                    .frame(width: size.width, height: size.height, alignment: .bottom)
                 // Old digit's top half, flipping down over the hinge.
                 // Hidden past 90° like CSS backface-visibility: hidden.
                 HalfDigit(text: flapDigit, half: .top, cardSize: size)
@@ -94,6 +98,7 @@ private struct FlipDigitView: View {
                         perspective: 0.5
                     )
                     .opacity(frontAngle > 90 ? 0 : 1)
+                    .frame(width: size.width, height: size.height, alignment: .top)
             }
         }
         .frame(width: size.width, height: size.height)
