@@ -13,11 +13,16 @@
 		36B49EDC618901AC32F3B044 /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB3C07B5864A91B76FAE50F /* Spacing.swift */; };
 		37B6811A4BD3533424174BE2 /* WidgetContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 427AB4A7A61643B6549459FD /* WidgetContainer.swift */; };
 		38C0843DD7FC14865E7A4152 /* ClockWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6D5E5827CD5D727398261F /* ClockWidget.swift */; };
+		3A6CDE6F0972CC4BAABE4DAD /* PerchSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A69ED0D808D4151DEFBF90 /* PerchSettingsView.swift */; };
 		43419DBBFAA9A7474A23716E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C0D5083ED2EA9CA77CD69447 /* Assets.xcassets */; };
 		60F5004A2D259BBFF39C9B66 /* Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1CC1F048DC7600EBDFB532 /* Appearance.swift */; };
 		7FC300A76D5BCC4D722BA7C7 /* DashboardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1B046A5709102D7D94DAD9 /* DashboardConfiguration.swift */; };
 		86494F30F3083CD7B195D8B1 /* WeatherWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347CCCA5975EDF4BCCF9A386 /* WeatherWidget.swift */; };
 		A49974E38CA15546A26136E7 /* WidgetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0BA272BB60B00A901336D3 /* WidgetModel.swift */; };
+		B5905AC192840F4C5548F77E /* AnalogClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEE536C3209FEE236EBA2EF /* AnalogClockView.swift */; };
+		B7A564E86FC46E8EE44038A1 /* ClockStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF8FCE4C8725F4CB908D472 /* ClockStyle.swift */; };
+		BE9B5F4A36FCD419F68D5662 /* FlipClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1E2475A66E34F8042EAA4 /* FlipClockView.swift */; };
+		DC3F4580B3D759B23DB39559 /* ConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271E55EC7481004963ABBA90 /* ConfigurationStore.swift */; };
 		DF0DE80B702401A43C683A16 /* TodoWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A317DEDDEB9EB0545555D5 /* TodoWidget.swift */; };
 		E595C325C6E0416966EC9306 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23D57F1D420BA3985AA1AFFD /* Typography.swift */; };
 		EB8BFA72BB50212241999993 /* DashboardLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86BE25EE453536FBDCC61280 /* DashboardLayout.swift */; };
@@ -29,23 +34,36 @@
 		09A9266FEDB78BAD64775B52 /* DashboardCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardCard.swift; sourceTree = "<group>"; };
 		0FE426E811311DDDBAD60987 /* WidgetGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetGrid.swift; sourceTree = "<group>"; };
 		23D57F1D420BA3985AA1AFFD /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		271E55EC7481004963ABBA90 /* ConfigurationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationStore.swift; sourceTree = "<group>"; };
 		2CB3C07B5864A91B76FAE50F /* Spacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
 		2D0BA272BB60B00A901336D3 /* WidgetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetModel.swift; sourceTree = "<group>"; };
 		347CCCA5975EDF4BCCF9A386 /* WeatherWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherWidget.swift; sourceTree = "<group>"; };
+		3BF8FCE4C8725F4CB908D472 /* ClockStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockStyle.swift; sourceTree = "<group>"; };
 		427AB4A7A61643B6549459FD /* WidgetContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetContainer.swift; sourceTree = "<group>"; };
 		6D6D5E5827CD5D727398261F /* ClockWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockWidget.swift; sourceTree = "<group>"; };
 		85A317DEDDEB9EB0545555D5 /* TodoWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoWidget.swift; sourceTree = "<group>"; };
 		86BE25EE453536FBDCC61280 /* DashboardLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardLayout.swift; sourceTree = "<group>"; };
 		A273FDF288DDD755E9D97E33 /* PerchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerchApp.swift; sourceTree = "<group>"; };
+		A5A69ED0D808D4151DEFBF90 /* PerchSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerchSettingsView.swift; sourceTree = "<group>"; };
 		AF1B046A5709102D7D94DAD9 /* DashboardConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardConfiguration.swift; sourceTree = "<group>"; };
 		B9B5176505DE28765432C9FC /* WidgetSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSize.swift; sourceTree = "<group>"; };
 		C0D5083ED2EA9CA77CD69447 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D41D4D3B908363F711572982 /* Perch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E049EE4BB40BD9FB428A05A9 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		F1A1E2475A66E34F8042EAA4 /* FlipClockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlipClockView.swift; sourceTree = "<group>"; };
 		FF1CC1F048DC7600EBDFB532 /* Appearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Appearance.swift; sourceTree = "<group>"; };
+		FFEE536C3209FEE236EBA2EF /* AnalogClockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalogClockView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		08DB55E74A3838BFE03C70E2 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				271E55EC7481004963ABBA90 /* ConfigurationStore.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
 		280C413E01C03B8FCC4FBF22 /* Todo */ = {
 			isa = PBXGroup;
 			children = (
@@ -104,7 +122,10 @@
 		9EDEAD281BBF15725FDA6408 /* Clock */ = {
 			isa = PBXGroup;
 			children = (
+				FFEE536C3209FEE236EBA2EF /* AnalogClockView.swift */,
+				3BF8FCE4C8725F4CB908D472 /* ClockStyle.swift */,
 				6D6D5E5827CD5D727398261F /* ClockWidget.swift */,
+				F1A1E2475A66E34F8042EAA4 /* FlipClockView.swift */,
 			);
 			path = Clock;
 			sourceTree = "<group>";
@@ -113,6 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				84D29FAAAC8075D7CD7B7E1E /* Models */,
+				08DB55E74A3838BFE03C70E2 /* Storage */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -161,6 +183,7 @@
 			isa = PBXGroup;
 			children = (
 				A273FDF288DDD755E9D97E33 /* PerchApp.swift */,
+				A5A69ED0D808D4151DEFBF90 /* PerchSettingsView.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -235,13 +258,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5905AC192840F4C5548F77E /* AnalogClockView.swift in Sources */,
 				60F5004A2D259BBFF39C9B66 /* Appearance.swift in Sources */,
+				B7A564E86FC46E8EE44038A1 /* ClockStyle.swift in Sources */,
 				38C0843DD7FC14865E7A4152 /* ClockWidget.swift in Sources */,
+				DC3F4580B3D759B23DB39559 /* ConfigurationStore.swift in Sources */,
 				01B23A343234A8CEF923448F /* DashboardCard.swift in Sources */,
 				7FC300A76D5BCC4D722BA7C7 /* DashboardConfiguration.swift in Sources */,
 				EB8BFA72BB50212241999993 /* DashboardLayout.swift in Sources */,
 				FFBFC1693DD980F23605870C /* DashboardView.swift in Sources */,
+				BE9B5F4A36FCD419F68D5662 /* FlipClockView.swift in Sources */,
 				19011216E650F7E6E16BFC6B /* PerchApp.swift in Sources */,
+				3A6CDE6F0972CC4BAABE4DAD /* PerchSettingsView.swift in Sources */,
 				36B49EDC618901AC32F3B044 /* Spacing.swift in Sources */,
 				DF0DE80B702401A43C683A16 /* TodoWidget.swift in Sources */,
 				E595C325C6E0416966EC9306 /* Typography.swift in Sources */,

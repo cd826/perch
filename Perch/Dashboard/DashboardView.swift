@@ -2,9 +2,15 @@ import SwiftUI
 
 /// The dashboard surface (SPEC §8, §31): a quiet grid of cards on a
 /// soft background. Composition comes entirely from the active
-/// DashboardConfiguration; this view hard-codes nothing.
+/// DashboardConfiguration; this view hard-codes nothing. The clock
+/// style is persisted and read here, so changing it in Settings
+/// rebuilds the configuration and animates the grid reflow (SPEC §12).
 struct DashboardView: View {
-    private let configuration = DashboardConfiguration.current
+    @AppStorage(ConfigurationStore.clockStyleKey) private var clockStyle: ClockStyle = .analog
+
+    private var configuration: DashboardConfiguration {
+        DashboardConfiguration(clockStyle: clockStyle)
+    }
 
     var body: some View {
         ZStack {
@@ -16,6 +22,7 @@ struct DashboardView: View {
             }
             .padding(Spacing.dashboardPadding)
         }
+        .animation(.smooth(duration: 0.35), value: clockStyle)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

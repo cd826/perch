@@ -15,5 +15,9 @@ struct PerchApp: App {
             height: DashboardLayout.defaultWindowHeight
         )
         .windowResizability(.contentMinSize)
+
+        Settings {
+            PerchSettingsView()
+        }
     }
 }

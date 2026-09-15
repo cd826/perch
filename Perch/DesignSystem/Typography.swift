@@ -6,6 +6,8 @@ enum Typography {
     static let metricLarge = Font.system(size: 56, weight: .medium, design: .rounded)
     /// Secondary numeric readouts (todo count, mock clock digits).
     static let metric = Font.system(size: 40, weight: .medium, design: .rounded)
+    /// Flip clock digits.
+    static let flipDigit = Font.system(size: 64, weight: .semibold, design: .rounded)
     /// Card titles (list name, city).
     static let widgetTitle = Font.system(size: 15, weight: .semibold, design: .rounded)
     /// Primary body text.

@@ -10,10 +10,12 @@ private struct MockHourForecast: Identifiable {
 
 /// V0.1 first round: mock weather matching the SPEC §16 example,
 /// sized for a 2-column card. Phase 5 swaps the mock values for
-/// WeatherService data; the display structure stays as-is.
+/// WeatherService data; the display structure stays as-is. Its span
+/// is injected by the dashboard configuration — weather fills the
+/// space the clock style leaves free (SPEC §8).
 struct WeatherWidget: DashboardWidget {
     var id: WidgetIdentifier { .weather }
-    var columnSpan: Int { DashboardConfiguration.current.layoutMode.columnSpan(for: .weather) }
+    let columnSpan: Int
     var minimumWidth: CGFloat { WidgetMinimumWidth.regular }
     var preferredHeight: CGFloat { WidgetHeight.standard }
 
@@ -31,6 +33,15 @@ struct WeatherWidget: DashboardWidget {
     ]
 
     var body: some View {
+        if columnSpan >= WidgetColumnSpan.double {
+            wideLayout
+        } else {
+            compactLayout
+        }
+    }
+
+    /// Two-column layout: current conditions beside the hourly strip.
+    private var wideLayout: some View {
         HStack(alignment: .center, spacing: Spacing.large) {
             VStack(alignment: .leading, spacing: Spacing.small) {
                 Text(city)
@@ -68,5 +79,48 @@ struct WeatherWidget: DashboardWidget {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+    }
+
+    /// One-column layout: current conditions above a shorter hourly strip.
+    private var compactLayout: some View {
+        VStack(alignment: .leading, spacing: Spacing.medium) {
+            HStack(alignment: .center, spacing: Spacing.medium) {
+                VStack(alignment: .leading, spacing: Spacing.xs) {
+                    Text(city)
+                        .font(Typography.widgetTitle)
+                        .foregroundStyle(.secondary)
+                    Text(condition)
+                        .font(Typography.body)
+                    Text(dailyRange)
+                        .font(Typography.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 0)
+                Text(temperature)
+                    .font(Typography.metric)
+            }
+            Divider()
+            HStack(spacing: Spacing.small) {
+                ForEach(hourly.prefix(4)) { item in
+                    VStack(spacing: Spacing.xs) {
+                        Text(item.hour)
+                            .font(Typography.caption)
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                            .lineLimit(1)
+                        Image(systemName: item.symbol)
+                            .font(.system(size: 15))
+                            .foregroundStyle(.tint)
+                        Text(item.temperature)
+                            .font(Typography.caption)
+                            .monospacedDigit()
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }

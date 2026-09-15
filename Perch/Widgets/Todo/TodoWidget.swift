@@ -5,7 +5,7 @@ import SwiftUI
 /// (EventKit); the display structure stays as-is.
 struct TodoWidget: DashboardWidget {
     var id: WidgetIdentifier { .todo }
-    var columnSpan: Int { DashboardConfiguration.current.layoutMode.columnSpan(for: .todo) }
+    var columnSpan: Int { WidgetColumnSpan.single }
     var minimumWidth: CGFloat { WidgetMinimumWidth.compact }
     var preferredHeight: CGFloat { WidgetHeight.standard }
 

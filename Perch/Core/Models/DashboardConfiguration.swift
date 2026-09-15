@@ -1,44 +1,19 @@
 import CoreGraphics
 
-/// Which built-in arrangement the dashboard uses (SPEC §8).
-/// Phase 3 derives this from the persisted ClockStyle; for now the
-/// dashboard always starts in the analog arrangement.
-enum DashboardLayoutMode: String, CaseIterable {
-    /// Clock 1 + Todo 1 + Weather 2 (SPEC §8.1).
-    case analogClock
-    /// Clock 2 + Todo 1 + Weather 1 (SPEC §8.2).
-    case flipClock
-
-    /// The column span of a widget under this layout mode. Switching
-    /// modes changes spans, and the grid recalculates automatically.
-    func columnSpan(for widget: WidgetIdentifier) -> Int {
-        switch (self, widget) {
-        case (.analogClock, .clock), (.analogClock, .todo):
-            return WidgetColumnSpan.single
-        case (.analogClock, .weather):
-            return WidgetColumnSpan.double
-        case (.flipClock, .clock):
-            return WidgetColumnSpan.double
-        case (.flipClock, .todo), (.flipClock, .weather):
-            return WidgetColumnSpan.single
-        }
-    }
-}
-
-/// Describes the current dashboard composition (SPEC §5, §8).
+/// Describes the current dashboard composition (SPEC §5, §8). The
+/// clock style drives the whole arrangement: switching it changes the
+/// clock's span and the weather's span, and the grid reflows without
+/// any manual repositioning (SPEC §8.2, §12).
 struct DashboardConfiguration {
-    let layoutMode: DashboardLayoutMode
+    let clockStyle: ClockStyle
 
     /// The built-in V0.1 widgets in display order. The dashboard does
     /// not hard-code them; it renders whatever this list contains.
     var widgets: [any DashboardWidget] {
         [
-            ClockWidget(),
+            ClockWidget(style: clockStyle),
             TodoWidget(),
-            WeatherWidget(),
+            WeatherWidget(columnSpan: clockStyle.weatherColumnSpan),
         ]
     }
-
-    /// V0.1 first round uses mock data in the analog arrangement.
-    static let current = DashboardConfiguration(layoutMode: .analogClock)
 }
