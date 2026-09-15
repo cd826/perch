@@ -142,11 +142,14 @@ struct WeatherWidget: DashboardWidget {
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
-    /// One-column top section: city and temperature share the first
-    /// row; condition and high/low get full-width rows below.
+    /// One-column top section: city top-left with temperature
+    /// top-right (both flush with the card's top edge, matching the
+    /// neighbouring todo title), then full-width condition and
+    /// text-style high/low rows. Sizes chosen so the hourly strip's
+    /// temperature row stays visible in the square card.
     private func compactTop(_ snapshot: WeatherSnapshot) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .firstTextBaseline) {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .top, spacing: Spacing.small) {
                 Text(snapshot.city)
                     .font(Typography.widgetTitle)
                     .lineLimit(1)
@@ -156,14 +159,16 @@ struct WeatherWidget: DashboardWidget {
             }
             HStack(spacing: 4) {
                 Text(snapshot.condition)
-                    .font(Typography.body)
+                    .font(Typography.caption)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                 Image(systemName: snapshot.symbolName)
-                    .font(.system(size: 12))
+                    .font(.system(size: 11))
                     .foregroundStyle(.primary)
             }
             HStack(spacing: 8) {
-                rangeItem("arrow.up", snapshot.high)
-                rangeItem("arrow.down", snapshot.low)
+                rangeText("最高", snapshot.high)
+                rangeText("最低", snapshot.low)
             }
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -174,17 +179,6 @@ struct WeatherWidget: DashboardWidget {
         HStack(spacing: 2) {
             Text(label)
                 .font(Typography.caption)
-                .foregroundStyle(.secondary)
-            Text("\(value)°")
-                .font(Typography.caption)
-                .monospacedDigit()
-        }
-    }
-
-    private func rangeItem(_ symbol: String, _ value: Int) -> some View {
-        HStack(spacing: 2) {
-            Image(systemName: symbol)
-                .font(.system(size: 9, weight: .semibold))
                 .foregroundStyle(.secondary)
             Text("\(value)°")
                 .font(Typography.caption)
