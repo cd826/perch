@@ -1,11 +1,12 @@
 import SwiftUI
 
-/// Flip clock (SPEC §11): 24-hour HH:MM on split-flap cards styled
-/// after the classic flip clock — near-black cards, oversized digits
-/// and a center seam. Card size and font scale with the card; digits
-/// flip when their value changes (once per minute for the minute
-/// digits). A 1-second TimelineView is the only timer; apart from a
-/// change-triggered transition the view stays idle.
+/// Flip clock (SPEC §11): 24-hour HH:MM on split-flap cards, modeled
+/// after classic web flip clocks (digitalclock.live): each card is a
+/// static top/bottom pair plus two animated flaps — the old digit's
+/// top half flips down over the center hinge while the new digit's
+/// bottom half falls back into place, 0.6s ease-in-out. A 1-second
+/// TimelineView is the only timer; apart from a change-triggered
+/// flip the view stays idle.
 struct FlipClockView: View {
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { timeline in
@@ -54,45 +55,109 @@ private struct FlipLayoutMetrics {
     }
 }
 
-/// One flip card showing a single digit, Fliqlo-style: near-black
-/// card, oversized light digit, hairline center seam, no border.
+/// One split-flap card showing a single digit.
 private struct FlipDigitView: View {
     let digit: String
     let size: CGSize
 
-    @State private var displayed: String = ""
+    // Static card halves. During a flip the upper half already shows
+    // the new digit — it is covered by the front flap (old digit)
+    // until that flap passes 90°.
+    @State private var upper: String = ""
+    @State private var lower: String = ""
+    @State private var flapDigit: String = ""
+    @State private var frontAngle: Double = 0
+    @State private var backAngle: Double = 180
+    @State private var isAnimating = false
 
     var body: some View {
         ZStack {
-            Text(displayed)
-                .font(.system(size: size.height * 0.72, weight: .semibold))
-                .foregroundStyle(Color(white: 0.84))
-                .transition(.flipPage)
-                .id(displayed)
+            HalfDigit(text: upper, half: .top, cardSize: size)
+            HalfDigit(text: lower, half: .bottom, cardSize: size)
+            if isAnimating {
+                // New digit's bottom half, starting flipped up out of
+                // view (180°) and falling back onto the lower half.
+                HalfDigit(text: lower, half: .bottom, cardSize: size)
+                    .rotation3DEffect(
+                        .degrees(backAngle),
+                        axis: (x: 1, y: 0, z: 0),
+                        anchor: .top,
+                        perspective: 0.5
+                    )
+                // Old digit's top half, flipping down over the hinge.
+                // Hidden past 90° like CSS backface-visibility: hidden.
+                HalfDigit(text: flapDigit, half: .top, cardSize: size)
+                    .rotation3DEffect(
+                        .degrees(frontAngle),
+                        axis: (x: 1, y: 0, z: 0),
+                        anchor: .bottom,
+                        perspective: 0.5
+                    )
+                    .opacity(frontAngle > 90 ? 0 : 1)
+            }
         }
         .frame(width: size.width, height: size.height)
-        .background {
-            ZStack {
-                VStack(spacing: 0) {
-                    Color(red: 0.145, green: 0.145, blue: 0.155)
-                    Color(red: 0.105, green: 0.105, blue: 0.115)
-                }
-                Rectangle()
-                    .fill(Color.white.opacity(0.09))
-                    .frame(height: 1)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: max(size.height * 0.045, 6), style: .continuous))
-        }
         .onChange(of: digit) { _, newValue in
-            guard newValue != displayed else { return }
-            withAnimation(.easeInOut(duration: 0.3)) {
-                displayed = newValue
+            guard !isAnimating else {
+                upper = newValue
+                lower = newValue
+                return
+            }
+            guard newValue != upper else { return }
+            isAnimating = true
+            flapDigit = upper      // the flap carries the old digit away
+            upper = newValue       // static top already shows the new digit
+            lower = newValue       // static bottom switches immediately
+            frontAngle = 0
+            backAngle = 180
+            withAnimation(.easeInOut(duration: 0.6)) {
+                frontAngle = 180
+                backAngle = 0
+            } completion: {
+                isAnimating = false
             }
         }
         .onAppear {
-            displayed = digit
+            upper = digit
+            lower = digit
         }
     }
+}
+
+/// One half of a flap card: near-black background, the digit clipped
+/// to this half, and the hairline seam on the top half's bottom edge.
+private struct HalfDigit: View {
+    let text: String
+    let half: CardHalf
+    let cardSize: CGSize
+
+    private var halfHeight: CGFloat { cardSize.height / 2 }
+
+    var body: some View {
+        ZStack {
+            Color(red: 0.11, green: 0.11, blue: 0.12)
+            Text(text)
+                .font(.system(size: cardSize.height * 0.78, weight: .semibold))
+                .foregroundStyle(Color(white: 0.8))
+                .frame(width: cardSize.width, height: cardSize.height)
+                .frame(width: cardSize.width, height: halfHeight,
+                       alignment: half == .top ? .top : .bottom)
+                .clipped()
+            if half == .top {
+                VStack {
+                    Spacer(minLength: 0)
+                    Rectangle()
+                        .fill(Color.white.opacity(0.1))
+                        .frame(height: 1)
+                }
+            }
+        }
+        .frame(width: cardSize.width, height: halfHeight)
+    }
+}
+
+private enum CardHalf {
+    case top, bottom
 }
 
 /// The blinking colon between the hour and minute card groups.
@@ -106,8 +171,8 @@ private struct FlipColonView: View {
             dot
         }
         .frame(width: size.width)
-        .foregroundStyle(Color(white: 0.42))
-        .opacity(active ? 1 : 0.3)
+        .foregroundStyle(Color(white: 0.25))
+        .opacity(active ? 1 : 0.35)
         .animation(.easeInOut(duration: 0.3), value: active)
     }
 
@@ -119,38 +184,5 @@ private struct FlipColonView: View {
 
     private var dotDiameter: CGFloat {
         max(size.width * 0.55, 5)
-    }
-}
-
-/// Page-flip transition: an incoming digit falls from the top hinge
-/// while the outgoing one tips away over the bottom hinge.
-private extension AnyTransition {
-    static var flipPage: AnyTransition {
-        .asymmetric(
-            insertion: .modifier(
-                active: FlipPageModifier(angle: -90, anchor: .top),
-                identity: FlipPageModifier(angle: 0, anchor: .top)
-            ),
-            removal: .modifier(
-                active: FlipPageModifier(angle: 90, anchor: .bottom),
-                identity: FlipPageModifier(angle: 0, anchor: .bottom)
-            )
-        )
-    }
-}
-
-private struct FlipPageModifier: ViewModifier {
-    let angle: Double
-    let anchor: UnitPoint
-
-    func body(content: Content) -> some View {
-        content
-            .rotation3DEffect(
-                .degrees(angle),
-                axis: (x: 1, y: 0, z: 0),
-                anchor: anchor,
-                perspective: 0.6
-            )
-            .opacity(max(0, 1 - abs(angle) / 90))
     }
 }
