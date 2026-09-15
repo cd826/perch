@@ -42,27 +42,32 @@ struct WeatherWidget: DashboardWidget {
 
     /// Two-column layout, styled like the macOS weather widget:
     /// city and current temperature on the left, condition and range
-    /// on the right, hourly strip along the bottom.
+    /// on the right, hourly strip along the bottom. Sized to fit the
+    /// square row (176pt) without stretching it.
     private var wideLayout: some View {
-        VStack(alignment: .leading, spacing: Spacing.medium) {
+        VStack(alignment: .leading, spacing: Spacing.small) {
             HStack(alignment: .top, spacing: Spacing.medium) {
                 VStack(alignment: .leading, spacing: Spacing.xs) {
                     Text(city)
                         .font(Typography.widgetTitle)
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
                     Text(temperature)
                         .font(Typography.temperatureLarge)
                 }
                 Spacer(minLength: 0)
                 VStack(alignment: .trailing, spacing: Spacing.xs) {
                     Image(systemName: currentSymbol)
-                        .font(.system(size: 26))
+                        .font(.system(size: 20))
                         .foregroundStyle(.tint)
                     Text(condition)
                         .font(Typography.body)
+                        .lineLimit(1)
                     Text(dailyRange)
                         .font(Typography.caption)
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
             }
             Divider()
@@ -108,7 +113,7 @@ struct WeatherWidget: DashboardWidget {
                         .monospacedDigit()
                         .lineLimit(1)
                     Image(systemName: item.symbol)
-                        .font(.system(size: 17))
+                        .font(.system(size: 15))
                         .foregroundStyle(.tint)
                     Text(item.temperature)
                         .font(Typography.caption)
