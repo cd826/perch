@@ -5,4 +5,6 @@ import Foundation
 enum ConfigurationStore {
     static let clockStyleKey = "perch.clockStyle"
     static let todoListIDKey = "perch.todoListID"
+    static let weatherLocationModeKey = "perch.weatherLocationMode"
+    static let weatherManualCityKey = "perch.weatherManualCity"
 }

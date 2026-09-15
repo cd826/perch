@@ -1,127 +1,237 @@
+import AppKit
 import SwiftUI
 
-private struct MockHourForecast: Identifiable {
-    let hour: String
-    let symbol: String
-    let temperature: String
-
-    var id: String { hour }
-}
-
-/// V0.1 first round: mock weather matching the SPEC §16 example,
-/// sized for a 2-column card. Phase 5 swaps the mock values for
-/// WeatherService data; the display structure stays as-is. Its span
-/// is injected by the dashboard configuration — weather fills the
-/// space the clock style leaves free (SPEC §8).
+/// Weather card backed by LocationService + WeatherService (SPEC
+/// §14–17). Renders every SPEC §22 situation — permission prompt,
+/// setup guidance, failure with last-updated time — and the live
+/// snapshot in a wide (2-column) or compact (1-column) layout.
 struct WeatherWidget: DashboardWidget {
+    @StateObject private var viewModel = WeatherViewModel()
+
     var id: WidgetIdentifier { .weather }
     let columnSpan: Int
     var minimumWidth: CGFloat { WidgetMinimumWidth.regular }
 
-    private let city = "Guangzhou"
-    private let temperature = "31°"
-    private let condition = "Mostly Clear"
-    private let currentSymbol = "cloud.sun"
-    private let dailyRange = "H:33°  L:26°"
-    private let hourly: [MockHourForecast] = [
-        .init(hour: "12", symbol: "sun.max", temperature: "32°"),
-        .init(hour: "13", symbol: "cloud.sun", temperature: "32°"),
-        .init(hour: "14", symbol: "cloud", temperature: "33°"),
-        .init(hour: "15", symbol: "cloud", temperature: "31°"),
-        .init(hour: "16", symbol: "cloud", temperature: "29°"),
-        .init(hour: "17", symbol: "cloud.drizzle", temperature: "27°"),
-    ]
+    init(columnSpan: Int) {
+        self.columnSpan = columnSpan
+    }
 
     var body: some View {
-        if columnSpan >= WidgetColumnSpan.double {
-            wideLayout
-        } else {
-            compactLayout
+        VStack(alignment: .leading, spacing: Spacing.medium) {
+            header
+            detail
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    // MARK: - Header
+
+    @ViewBuilder private var header: some View {
+        switch viewModel.state {
+        case .loaded(let snapshot, _):
+            Text(snapshot.city)
+                .font(Typography.widgetTitle)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+        default:
+            Text("天气")
+                .font(Typography.widgetTitle)
+                .foregroundStyle(.secondary)
         }
     }
 
+    // MARK: - Body per state
+
+    @ViewBuilder private var detail: some View {
+        switch viewModel.state {
+        case .loading:
+            ProgressView()
+                .controlSize(.small)
+
+        case .needsLocationPermission:
+            VStack(alignment: .leading, spacing: Spacing.small) {
+                Text("启用定位显示当地天气，或在设置中手动输入城市。")
+                    .font(Typography.body)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3)
+                Button("启用定位") { viewModel.requestLocationAccess() }
+                    .controlSize(.small)
+            }
+
+        case .setupRequired:
+            VStack(alignment: .leading, spacing: Spacing.small) {
+                Text("在设置中启用定位，或手动输入要显示天气的城市。")
+                    .font(Typography.body)
+                    .foregroundStyle(.secondary)
+                Button("打开设置") { Self.openAppSettings() }
+                    .controlSize(.small)
+            }
+
+        case .failed(let message, let snapshot):
+            VStack(alignment: .leading, spacing: Spacing.small) {
+                Text("天气数据不可用。")
+                    .font(Typography.body)
+                    .foregroundStyle(.secondary)
+                Text(message)
+                    .font(Typography.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                if let snapshot {
+                    lastUpdatedText(for: snapshot)
+                    miniSnapshot(snapshot)
+                }
+                Button("重试") { viewModel.refreshNow() }
+                    .controlSize(.small)
+            }
+
+        case .loaded(let snapshot, let staleNotice):
+            if columnSpan >= WidgetColumnSpan.double {
+                wideLayout(snapshot)
+            } else {
+                compactLayout(snapshot)
+            }
+            if let staleNotice {
+                Text(staleNotice)
+                    .font(Typography.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+        }
+    }
+
+    // MARK: - Data layouts
+
     /// Two-column layout, styled like the macOS weather widget:
     /// city and current temperature on the left, condition and range
-    /// on the right, hourly strip along the bottom. Sized to fit the
-    /// square row (176pt) without stretching it.
-    private var wideLayout: some View {
+    /// on the right, hourly strip along the bottom.
+    private func wideLayout(_ snapshot: WeatherSnapshot) -> some View {
         VStack(alignment: .leading, spacing: Spacing.small) {
             HStack(alignment: .top, spacing: Spacing.medium) {
                 VStack(alignment: .leading, spacing: Spacing.xs) {
-                    Text(city)
-                        .font(Typography.widgetTitle)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                    Text(temperature)
+                    Text("\(snapshot.temperature)°")
                         .font(Typography.temperatureLarge)
                 }
                 Spacer(minLength: 0)
                 VStack(alignment: .trailing, spacing: Spacing.xs) {
-                    Image(systemName: currentSymbol)
+                    Image(systemName: snapshot.symbolName)
                         .font(.system(size: 20))
                         .foregroundStyle(.tint)
-                    Text(condition)
+                    Text(snapshot.condition)
                         .font(Typography.body)
                         .lineLimit(1)
-                    Text(dailyRange)
-                        .font(Typography.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                    HStack(spacing: Spacing.xs) {
+                        Text("H:\(snapshot.high)°")
+                        Text("L:\(snapshot.low)°")
+                    }
+                    .font(Typography.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    if snapshot.isFallback {
+                        Text("演示数据")
+                            .font(Typography.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
             Divider()
-            hourlyStrip(itemCount: hourly.count)
+            hourlyStrip(Array(snapshot.hourly.prefix(6)))
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
-    /// One-column layout for narrow cards: city, temperature beside
-    /// the daily range (the condition line is dropped — it does not
-    /// fit a 1-column card), then a shorter hourly strip.
-    private var compactLayout: some View {
+    /// One-column layout for narrow cards: current conditions above a
+    /// shorter hourly strip; the condition line is dropped — it does
+    /// not fit a 1-column card.
+    private func compactLayout(_ snapshot: WeatherSnapshot) -> some View {
         VStack(alignment: .leading, spacing: Spacing.small) {
-            Text(city)
-                .font(Typography.widgetTitle)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
             HStack(alignment: .firstTextBaseline, spacing: Spacing.small) {
-                Text(temperature)
+                Text("\(snapshot.temperature)°")
                     .font(Typography.temperatureCompact)
                 Spacer(minLength: Spacing.small)
-                Text(dailyRange)
+                Text("H:\(snapshot.high)° L:\(snapshot.low)°")
                     .font(Typography.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }
             Divider()
-            hourlyStrip(itemCount: 4)
+            hourlyStrip(itemCount: 4, from: snapshot.hourly)
+            if snapshot.isFallback {
+                Text("演示数据")
+                    .font(Typography.caption)
+                    .foregroundStyle(.secondary)
+            }
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
-    private func hourlyStrip(itemCount: Int) -> some View {
+    private func hourlyStrip(_ entries: [WeatherSnapshot.HourEntry]) -> some View {
         HStack(spacing: Spacing.small) {
-            ForEach(hourly.prefix(itemCount)) { item in
+            ForEach(entries) { entry in
                 VStack(spacing: Spacing.xs) {
-                    Text(item.hour)
+                    Text(entry.hour)
                         .font(Typography.caption)
                         .foregroundStyle(.secondary)
                         .monospacedDigit()
                         .lineLimit(1)
-                    Image(systemName: item.symbol)
+                    Image(systemName: entry.symbolName)
                         .font(.system(size: 15))
                         .foregroundStyle(.tint)
-                    Text(item.temperature)
+                    Text("\(entry.temperature)°")
                         .font(Typography.caption)
                         .monospacedDigit()
                         .lineLimit(1)
                 }
                 .frame(maxWidth: .infinity)
             }
+        }
+    }
+
+    private func hourlyStrip(itemCount: Int, from entries: [WeatherSnapshot.HourEntry]) -> some View {
+        hourlyStrip(Array(entries.prefix(itemCount)))
+    }
+
+    private func lastUpdatedText(for snapshot: WeatherSnapshot) -> some View {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return Text("最后更新：\(formatter.string(from: snapshot.fetchedAt))")
+            .font(Typography.caption)
+            .foregroundStyle(.secondary)
+    }
+
+    private func miniSnapshot(_ snapshot: WeatherSnapshot) -> some View {
+        HStack(spacing: Spacing.small) {
+            Image(systemName: snapshot.symbolName)
+                .foregroundStyle(.tint)
+            Text("\(snapshot.temperature)°")
+                .monospacedDigit()
+        }
+        .font(Typography.caption)
+    }
+
+    // MARK: - Helpers
+
+    private var accessibilityLabel: String {
+        switch viewModel.state {
+        case .loaded(let snapshot, _):
+            let fallback = snapshot.isFallback ? "（演示数据）" : ""
+            return "天气 \(snapshot.city)，\(snapshot.temperature) 度，\(snapshot.condition)\(fallback)"
+        case .needsLocationPermission:
+            return "天气，需要定位权限"
+        default:
+            return "天气"
+        }
+    }
+
+    private static func openAppSettings() {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices") {
+            NSWorkspace.shared.open(url)
         }
     }
 }

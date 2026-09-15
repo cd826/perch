@@ -49,6 +49,26 @@ final class ReminderService: ObservableObject {
     private var changeToken: NSObjectProtocol?
     private var reloadTask: Task<Void, Never>?
 
+    /// One-shot sink for fetchReminders' completion, which can fire
+    /// more than once when the calendar source changes.
+    private final class ReminderFetchBox: @unchecked Sendable {
+        private let lock = NSLock()
+        private var filled = false
+        private var stored: [EKReminder] = []
+
+        var isFilled: Bool { lock.withLock { filled } }
+
+        func fill(_ value: [EKReminder]?) {
+            lock.lock()
+            defer { lock.unlock() }
+            guard !filled else { return }
+            filled = true
+            stored = value ?? []
+        }
+
+        var value: [EKReminder] { lock.withLock { stored } }
+    }
+
     private init() {
         status = Self.status(for: EKEventStore.authorizationStatus(for: .reminder))
 
@@ -145,13 +165,24 @@ final class ReminderService: ObservableObject {
             tasks = []
             return
         }
+        // fetchReminders' completion can hang or fire more than once,
+        // so results go through a one-shot box with a polling timeout
+        // instead of a continuation.
         let predicate = store.predicateForReminders(in: [calendar])
-        let reminders: [EKReminder]? = await withCheckedContinuation { continuation in
-            store.fetchReminders(matching: predicate) { continuation.resume(returning: $0) }
+        let box = ReminderFetchBox()
+        store.fetchReminders(matching: predicate) { box.fill($0) }
+
+        let deadline = Date().addingTimeInterval(12)
+        while !box.isFilled && Date() < deadline {
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            if Task.isCancelled { return }
         }
-        guard let reminders else { return }  // source changed mid-fetch; keep last good tasks
+        guard box.isFilled else {
+            loadError = "加载提醒事项超时。"
+            return
+        }
         tasks = Array(
-            reminders
+            box.value
                 .filter { !$0.isCompleted }
                 .sorted { lhs, rhs in
                     let lhsDue = lhs.dueDateComponents?.date ?? .distantFuture

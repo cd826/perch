@@ -25,6 +25,7 @@ targets:
         GENERATE_INFOPLIST_FILE: true
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
         INFOPLIST_KEY_NSRemindersFullAccessUsageDescription: "Perch 在仪表盘上显示你的提醒事项待办。"
+        INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Perch 使用你的位置自动获取当地天气。"
         CODE_SIGN_STYLE: Automatic
         CODE_SIGN_IDENTITY: "-"
         ENABLE_HARDENED_RUNTIME: true
