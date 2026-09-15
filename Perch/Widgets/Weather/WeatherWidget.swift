@@ -192,8 +192,10 @@ struct WeatherWidget: DashboardWidget {
         }
     }
 
-    /// Hourly strip: equal-width columns, each centered, so the gaps
-    /// between hours stay consistent.
+    /// Hourly strip: equal-width columns, each centered on a shared
+    /// vertical axis (time, icon, temperature), evenly distributed —
+    /// icons sit in fixed-width slots so different symbol widths
+    /// cannot make the visual gaps uneven.
     private func hourlyStrip(_ entries: [WeatherSnapshot.HourEntry]) -> some View {
         HStack(spacing: 0) {
             ForEach(entries) { entry in
@@ -203,13 +205,16 @@ struct WeatherWidget: DashboardWidget {
                         .foregroundStyle(.secondary)
                         .monospacedDigit()
                         .lineLimit(1)
+                        .fixedSize()
                     Image(systemName: entry.symbolName)
-                        .font(.system(size: 14))
+                        .font(.system(size: 15))
                         .foregroundStyle(.primary)
+                        .frame(width: 22)
                     Text("\(entry.temperature)°")
                         .font(Typography.caption)
                         .monospacedDigit()
                         .lineLimit(1)
+                        .fixedSize()
                 }
                 .frame(maxWidth: .infinity)
             }
