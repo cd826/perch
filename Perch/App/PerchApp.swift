@@ -11,6 +11,7 @@ struct PerchApp: App {
                 )
                 .background(WindowConfigurator())
         }
+        .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentMinSize)
 
         Settings {
