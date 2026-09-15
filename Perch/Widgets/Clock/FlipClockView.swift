@@ -1,9 +1,11 @@
 import SwiftUI
 
-/// Flip clock (SPEC §11): 24-hour HH:MM on split cards. Digits run a
-/// page-flip transition whenever their value changes (once per minute
-/// for the minute digits). A 1-second TimelineView is the only timer;
-/// apart from a change-triggered transition the view stays idle.
+/// Flip clock (SPEC §11): 24-hour HH:MM on split-flap cards styled
+/// after the classic flip clock — near-black cards, oversized digits
+/// and a center seam. Card size and font scale with the card; digits
+/// flip when their value changes (once per minute for the minute
+/// digits). A 1-second TimelineView is the only timer; apart from a
+/// change-triggered transition the view stays idle.
 struct FlipClockView: View {
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { timeline in
@@ -13,14 +15,17 @@ struct FlipClockView: View {
             let hour = components.hour ?? 0
             let minute = components.minute ?? 0
 
-            HStack(spacing: Spacing.small) {
-                FlipDigitView(digit: digit(at: 0, of: hour))
-                FlipDigitView(digit: digit(at: 1, of: hour))
-                FlipColonView(active: (components.second ?? 0).isMultiple(of: 2))
-                FlipDigitView(digit: digit(at: 0, of: minute))
-                FlipDigitView(digit: digit(at: 1, of: minute))
+            GeometryReader { geo in
+                let metrics = FlipLayoutMetrics(width: geo.size.width, height: geo.size.height)
+                HStack(spacing: metrics.gap) {
+                    FlipDigitView(digit: digit(at: 0, of: hour), size: metrics.cardSize)
+                    FlipDigitView(digit: digit(at: 1, of: hour), size: metrics.cardSize)
+                    FlipColonView(active: (components.second ?? 0).isMultiple(of: 2), size: metrics.colonSize)
+                    FlipDigitView(digit: digit(at: 0, of: minute), size: metrics.cardSize)
+                    FlipDigitView(digit: digit(at: 1, of: minute), size: metrics.cardSize)
+                }
+                .frame(width: geo.size.width, height: geo.size.height)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
@@ -31,23 +36,53 @@ struct FlipClockView: View {
     }
 }
 
-/// One flip card showing a single digit.
+/// Shared geometry for one flip-clock row: four digit cards plus a
+/// colon, all derived from the available width and height.
+private struct FlipLayoutMetrics {
+    let cardSize: CGSize
+    let colonSize: CGSize
+    let gap: CGFloat
+
+    init(width: CGFloat, height: CGFloat) {
+        gap = max(width * 0.018, 8)
+        let colonWidth = max(width * 0.028, 12)
+        // Row structure: card card [colon] card card → 4 gaps.
+        let cardWidth = (width - 4 * gap - colonWidth) / 4
+        let cardHeight = min(height, cardWidth / 0.78)
+        cardSize = CGSize(width: cardWidth, height: cardHeight)
+        colonSize = CGSize(width: colonWidth, height: cardHeight)
+    }
+}
+
+/// One flip card showing a single digit, Fliqlo-style: near-black
+/// card, oversized light digit, hairline center seam, no border.
 private struct FlipDigitView: View {
     let digit: String
+    let size: CGSize
 
     @State private var displayed: String = ""
 
     var body: some View {
         ZStack {
             Text(displayed)
-                .font(Typography.flipDigit)
-                .monospacedDigit()
+                .font(.system(size: size.height * 0.72, weight: .semibold))
+                .foregroundStyle(Color(white: 0.84))
                 .transition(.flipPage)
                 .id(displayed)
         }
-        .modifier(FlipCardBackground())
-        .aspectRatio(0.8, contentMode: .fit)
-        .frame(maxHeight: .infinity)
+        .frame(width: size.width, height: size.height)
+        .background {
+            ZStack {
+                VStack(spacing: 0) {
+                    Color(red: 0.145, green: 0.145, blue: 0.155)
+                    Color(red: 0.105, green: 0.105, blue: 0.115)
+                }
+                Rectangle()
+                    .fill(Color.white.opacity(0.09))
+                    .frame(height: 1)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: max(size.height * 0.045, 6), style: .continuous))
+        }
         .onChange(of: digit) { _, newValue in
             guard newValue != displayed else { return }
             withAnimation(.easeInOut(duration: 0.3)) {
@@ -60,44 +95,30 @@ private struct FlipDigitView: View {
     }
 }
 
-/// The blinking colon between hours and minutes.
+/// The blinking colon between the hour and minute card groups.
 private struct FlipColonView: View {
     let active: Bool
+    let size: CGSize
 
     var body: some View {
-        VStack(spacing: Spacing.xs) {
-            Circle().frame(width: 8, height: 8)
-            Circle().frame(width: 8, height: 8)
+        VStack(spacing: size.height * 0.14) {
+            dot
+            dot
         }
-        .foregroundStyle(.tint)
-        .opacity(active ? 1 : 0.25)
+        .frame(width: size.width)
+        .foregroundStyle(Color(white: 0.42))
+        .opacity(active ? 1 : 0.3)
         .animation(.easeInOut(duration: 0.3), value: active)
     }
-}
 
-/// Card look shared by flip digits: material base, subtle split into
-/// top/bottom halves, hairline seam and border.
-private struct FlipCardBackground: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .background {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(.regularMaterial)
-                    VStack(spacing: 0) {
-                        Color.primary.opacity(0.05)
-                        Color.primary.opacity(0)
-                    }
-                    Rectangle()
-                        .fill(Color.primary.opacity(0.18))
-                        .frame(height: 1)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .strokeBorder(Color.primary.opacity(0.1))
-                }
-            }
+    private var dot: some View {
+        SwiftUI.Circle()
+            .frame(width: dotDiameter)
+            .frame(height: dotDiameter)
+    }
+
+    private var dotDiameter: CGFloat {
+        max(size.width * 0.55, 5)
     }
 }
 
