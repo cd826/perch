@@ -192,13 +192,14 @@ struct WeatherWidget: DashboardWidget {
         }
     }
 
-    /// Hourly strip: equal-width columns, each centered on a shared
-    /// vertical axis (time, icon, temperature), evenly distributed —
-    /// icons sit in fixed-width slots so different symbol widths
-    /// cannot make the visual gaps uneven.
+    /// Hourly strip justified like the macOS weather widget: the
+    /// first column hugs the card's left baseline (under the city),
+    /// the last hugs the right edge, and the gaps between columns are
+    /// exactly equal (flexible spacers share the leftover width).
+    /// Within a column, time/icon/temperature share one center axis.
     private func hourlyStrip(_ entries: [WeatherSnapshot.HourEntry]) -> some View {
         HStack(spacing: 0) {
-            ForEach(entries) { entry in
+            ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
                 VStack(alignment: .center, spacing: 3) {
                     Text("\(entry.hour)时")
                         .font(Typography.caption)
@@ -216,9 +217,12 @@ struct WeatherWidget: DashboardWidget {
                         .lineLimit(1)
                         .fixedSize()
                 }
-                .frame(maxWidth: .infinity)
+                if index < entries.count - 1 {
+                    Spacer(minLength: Spacing.small)
+                }
             }
         }
+        .frame(maxWidth: .infinity)
     }
 
     private func hourlyStrip(itemCount: Int, from entries: [WeatherSnapshot.HourEntry]) -> some View {
