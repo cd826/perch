@@ -7,4 +7,5 @@ enum ConfigurationStore {
     static let todoListIDKey = "perch.todoListID"
     static let weatherLocationModeKey = "perch.weatherLocationMode"
     static let weatherManualCityKey = "perch.weatherManualCity"
+    static let appearanceKey = "perch.appearance"
 }

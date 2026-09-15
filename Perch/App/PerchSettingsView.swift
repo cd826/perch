@@ -1,10 +1,11 @@
 import SwiftUI
 
 /// V0.1 settings (SPEC §21): clock style, the Reminders list the todo
-/// card displays, and the weather location mode/city. All persist via
-/// ConfigurationStore keys (SPEC §24).
+/// card displays, the weather location mode/city, and the app
+/// appearance. All persist via ConfigurationStore keys (SPEC §24).
 struct PerchSettingsView: View {
     @AppStorage(ConfigurationStore.clockStyleKey) private var clockStyle: ClockStyle = .analog
+    @AppStorage(ConfigurationStore.appearanceKey) private var appearance: AppAppearance = .system
     @ObservedObject private var reminderService = ReminderService.shared
     @ObservedObject private var locationService = LocationService.shared
 
@@ -29,9 +30,20 @@ struct PerchSettingsView: View {
             Section("天气") {
                 weatherSection
             }
+
+            Section("外观") {
+                Picker("主题", selection: $appearance) {
+                    ForEach(AppAppearance.allCases, id: \.self) { appearance in
+                        Text(appearance.displayName)
+                            .tag(appearance)
+                    }
+                }
+                .pickerStyle(.radioGroup)
+            }
         }
         .formStyle(.grouped)
-        .frame(width: 400, height: 480)
+        .frame(width: 400, height: 620)
+        .preferredColorScheme(appearance.colorScheme)
         .onAppear { cityDraft = locationService.manualCity }
     }
 

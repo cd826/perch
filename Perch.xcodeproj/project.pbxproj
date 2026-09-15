@@ -24,6 +24,7 @@
 		A49974E38CA15546A26136E7 /* WidgetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0BA272BB60B00A901336D3 /* WidgetModel.swift */; };
 		B4E5DC469A07F9ABB45C4DF9 /* ReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BB769609F968E535E4A7CC2 /* ReminderService.swift */; };
 		B5905AC192840F4C5548F77E /* AnalogClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEE536C3209FEE236EBA2EF /* AnalogClockView.swift */; };
+		B63EA4DF4E472F8C41B0D606 /* AppAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16BE9A8CEBF93FC2EEA8B866 /* AppAppearance.swift */; };
 		B7A564E86FC46E8EE44038A1 /* ClockStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF8FCE4C8725F4CB908D472 /* ClockStyle.swift */; };
 		BE9B5F4A36FCD419F68D5662 /* FlipClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1E2475A66E34F8042EAA4 /* FlipClockView.swift */; };
 		C16A0E95E43DA67BC248CE93 /* WeatherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD4BD91BFE65D30938FD0F1C /* WeatherViewModel.swift */; };
@@ -41,6 +42,7 @@
 		0809DCED02F8D78BB3DAA40A /* TodoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoViewModel.swift; sourceTree = "<group>"; };
 		09A9266FEDB78BAD64775B52 /* DashboardCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardCard.swift; sourceTree = "<group>"; };
 		0FE426E811311DDDBAD60987 /* WidgetGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetGrid.swift; sourceTree = "<group>"; };
+		16BE9A8CEBF93FC2EEA8B866 /* AppAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAppearance.swift; sourceTree = "<group>"; };
 		23D57F1D420BA3985AA1AFFD /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		271E55EC7481004963ABBA90 /* ConfigurationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationStore.swift; sourceTree = "<group>"; };
 		2CB3C07B5864A91B76FAE50F /* Spacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
@@ -138,6 +140,7 @@
 		84D29FAAAC8075D7CD7B7E1E /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				16BE9A8CEBF93FC2EEA8B866 /* AppAppearance.swift */,
 				AF1B046A5709102D7D94DAD9 /* DashboardConfiguration.swift */,
 				2D0BA272BB60B00A901336D3 /* WidgetModel.swift */,
 				B9B5176505DE28765432C9FC /* WidgetSize.swift */,
@@ -288,6 +291,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B5905AC192840F4C5548F77E /* AnalogClockView.swift in Sources */,
+				B63EA4DF4E472F8C41B0D606 /* AppAppearance.swift in Sources */,
 				60F5004A2D259BBFF39C9B66 /* Appearance.swift in Sources */,
 				B7A564E86FC46E8EE44038A1 /* ClockStyle.swift in Sources */,
 				38C0843DD7FC14865E7A4152 /* ClockWidget.swift in Sources */,

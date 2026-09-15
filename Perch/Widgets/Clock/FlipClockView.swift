@@ -27,6 +27,9 @@ struct FlipClockView: View {
                 }
                 .frame(width: geo.size.width, height: geo.size.height)
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("翻页时钟")
+            .accessibilityValue(String(format: "当前时间 %02d:%02d", hour, minute))
         }
     }
 

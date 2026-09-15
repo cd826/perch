@@ -9,9 +9,18 @@ struct AnalogClockView: View {
     var body: some View {
         TimelineView(.animation) { timeline in
             ClockFace(date: timeline.date)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("模拟时钟")
+                .accessibilityValue("当前时间 \(Self.timeText(date: timeline.date))")
         }
         .aspectRatio(1, contentMode: .fit)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    static func timeText(date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: date)
     }
 }
 
