@@ -165,7 +165,9 @@ private enum CardHalf {
     case top, bottom
 }
 
-/// The blinking colon between the hour and minute card groups.
+/// The breathing colon between the hour and minute card groups —
+/// vivid orange (echoing the analog clock's second hand) so the dark
+/// card row keeps a lively accent.
 private struct FlipColonView: View {
     let active: Bool
     let size: CGSize
@@ -176,9 +178,10 @@ private struct FlipColonView: View {
             dot
         }
         .frame(width: size.width)
-        .foregroundStyle(Color(white: 0.25))
-        .opacity(active ? 1 : 0.35)
-        .animation(.easeInOut(duration: 0.3), value: active)
+        .foregroundStyle(Color(red: 1.0, green: 0.55, blue: 0.05))
+        .shadow(color: Color(red: 1.0, green: 0.55, blue: 0.05).opacity(active ? 0.8 : 0), radius: size.width * 0.25)
+        .opacity(active ? 1 : 0.4)
+        .animation(.easeInOut(duration: 0.5), value: active)
     }
 
     private var dot: some View {
