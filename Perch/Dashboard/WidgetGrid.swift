@@ -4,8 +4,8 @@ private struct ColumnSpanKey: LayoutValueKey {
     static let defaultValue = 1
 }
 
-private struct PreferredHeightKey: LayoutValueKey {
-    static let defaultValue = CGFloat.zero
+private struct HeightRatioKey: LayoutValueKey {
+    static let defaultValue: CGFloat = 1
 }
 
 extension View {
@@ -14,16 +14,19 @@ extension View {
         layoutValue(key: ColumnSpanKey.self, value: max(span, 1))
     }
 
-    /// Declares the height this view prefers inside its grid row.
-    func gridPreferredHeight(_ height: CGFloat) -> some View {
-        layoutValue(key: PreferredHeightKey.self, value: height)
+    /// Declares the row height as a multiple of the column width
+    /// (1 = square, like macOS desktop widgets).
+    func gridHeightRatio(_ ratio: CGFloat) -> some View {
+        layoutValue(key: HeightRatioKey.self, value: max(ratio, 0.1))
     }
 }
 
 /// A fixed-column responsive grid (SPEC §7): children are placed left
 /// to right and wrap to a new row when the current row runs out of
-/// columns. The grid knows nothing about widget internals — children
-/// carry their own span and preferred height via the modifiers above.
+/// columns. Row height follows the column width so cards keep macOS
+/// widget proportions (square for 1 column, ~2:1 for 2 columns).
+/// The grid knows nothing about widget internals — children carry
+/// their own span and height ratio via the modifiers above.
 struct WidgetGrid: Layout {
     var columnCount: Int
     var spacing: CGFloat
@@ -47,12 +50,10 @@ struct WidgetGrid: Layout {
                 rows.append(current)
                 current = Row()
             }
-            let itemWidth = columnWidth * CGFloat(span) + spacing * CGFloat(span - 1)
-            let intrinsic = subview.sizeThatFits(ProposedViewSize(width: itemWidth, height: nil))
-            let preferred = subview[PreferredHeightKey.self]
             current.items.append((subview, span))
             current.spanTotal += span
-            current.height = max(current.height, preferred > 0 ? preferred : intrinsic.height)
+            let rowHeight = columnWidth * subview[HeightRatioKey.self]
+            current.height = max(current.height, rowHeight)
         }
         if !current.items.isEmpty { rows.append(current) }
         return (rows, columnWidth)

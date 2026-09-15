@@ -12,6 +12,6 @@ struct WidgetContainer: View {
             widget.asAnyView
         }
         .gridColumnSpan(widget.columnSpan)
-        .gridPreferredHeight(widget.preferredHeight)
+        .gridHeightRatio(widget.heightRatio)
     }
 }

@@ -10,7 +10,6 @@ struct ClockWidget: DashboardWidget {
     var minimumWidth: CGFloat {
         style == .flip ? WidgetMinimumWidth.regular : WidgetMinimumWidth.compact
     }
-    var preferredHeight: CGFloat { WidgetHeight.standard }
 
     var body: some View {
         switch style {

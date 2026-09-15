@@ -9,11 +9,8 @@ struct PerchApp: App {
                     minWidth: DashboardLayout.minimumWindowWidth,
                     minHeight: DashboardLayout.minimumWindowHeight
                 )
+                .background(WindowConfigurator())
         }
-        .defaultSize(
-            width: DashboardLayout.defaultWindowWidth,
-            height: DashboardLayout.defaultWindowHeight
-        )
         .windowResizability(.contentMinSize)
 
         Settings {

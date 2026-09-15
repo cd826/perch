@@ -19,11 +19,15 @@ protocol DashboardWidget: View {
     var columnSpan: Int { get }
     /// Smallest width the widget stays usable at.
     var minimumWidth: CGFloat { get }
-    /// Height the widget prefers inside its grid row.
-    var preferredHeight: CGFloat { get }
+    /// Row height as a multiple of the column width (1 = square card,
+    /// matching the macOS desktop-widget proportions).
+    var heightRatio: CGFloat { get }
 }
 
 extension DashboardWidget {
+    /// Default row height: square (macOS small-widget proportions).
+    var heightRatio: CGFloat { 1 }
+
     /// Type-erased view so heterogeneous widgets can share one collection.
     var asAnyView: AnyView { AnyView(self) }
 }

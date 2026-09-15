@@ -2,9 +2,9 @@ import SwiftUI
 
 /// Shared type scale for the dashboard (SPEC §18, §2.2 glanceable).
 enum Typography {
-    /// Large numeric readouts.
-    static let metricLarge = Font.system(size: 56, weight: .medium, design: .rounded)
-    /// Secondary numeric readouts (todo count, mock clock digits).
+    /// Hero temperature readout (weather widget).
+    static let temperatureLarge = Font.system(size: 64, weight: .medium, design: .rounded)
+    /// Secondary numeric readouts (todo count, compact temperature).
     static let metric = Font.system(size: 40, weight: .medium, design: .rounded)
     /// Flip clock digits.
     static let flipDigit = Font.system(size: 64, weight: .semibold, design: .rounded)

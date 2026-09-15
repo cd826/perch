@@ -22,6 +22,7 @@
 		B5905AC192840F4C5548F77E /* AnalogClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEE536C3209FEE236EBA2EF /* AnalogClockView.swift */; };
 		B7A564E86FC46E8EE44038A1 /* ClockStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF8FCE4C8725F4CB908D472 /* ClockStyle.swift */; };
 		BE9B5F4A36FCD419F68D5662 /* FlipClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1E2475A66E34F8042EAA4 /* FlipClockView.swift */; };
+		C6C4236B90E7DB3EABAD972B /* WindowConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23AC04FB60497CB970AFED4 /* WindowConfigurator.swift */; };
 		DC3F4580B3D759B23DB39559 /* ConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271E55EC7481004963ABBA90 /* ConfigurationStore.swift */; };
 		DF0DE80B702401A43C683A16 /* TodoWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A317DEDDEB9EB0545555D5 /* TodoWidget.swift */; };
 		E595C325C6E0416966EC9306 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23D57F1D420BA3985AA1AFFD /* Typography.swift */; };
@@ -48,6 +49,7 @@
 		AF1B046A5709102D7D94DAD9 /* DashboardConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardConfiguration.swift; sourceTree = "<group>"; };
 		B9B5176505DE28765432C9FC /* WidgetSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSize.swift; sourceTree = "<group>"; };
 		C0D5083ED2EA9CA77CD69447 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C23AC04FB60497CB970AFED4 /* WindowConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowConfigurator.swift; sourceTree = "<group>"; };
 		D41D4D3B908363F711572982 /* Perch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E049EE4BB40BD9FB428A05A9 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		F1A1E2475A66E34F8042EAA4 /* FlipClockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlipClockView.swift; sourceTree = "<group>"; };
@@ -184,6 +186,7 @@
 			children = (
 				A273FDF288DDD755E9D97E33 /* PerchApp.swift */,
 				A5A69ED0D808D4151DEFBF90 /* PerchSettingsView.swift */,
+				C23AC04FB60497CB970AFED4 /* WindowConfigurator.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -278,6 +281,7 @@
 				0B02A862A8CF37E76673AC1A /* WidgetGrid.swift in Sources */,
 				A49974E38CA15546A26136E7 /* WidgetModel.swift in Sources */,
 				F68867CAB895B04D90CD1E96 /* WidgetSize.swift in Sources */,
+				C6C4236B90E7DB3EABAD972B /* WindowConfigurator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

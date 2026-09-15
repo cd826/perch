@@ -7,7 +7,6 @@ struct TodoWidget: DashboardWidget {
     var id: WidgetIdentifier { .todo }
     var columnSpan: Int { WidgetColumnSpan.single }
     var minimumWidth: CGFloat { WidgetMinimumWidth.compact }
-    var preferredHeight: CGFloat { WidgetHeight.standard }
 
     private let listName = "Work"
     private let mockTasks = ["Review PR", "Reply to email", "Submit report"]

@@ -17,11 +17,11 @@ struct WeatherWidget: DashboardWidget {
     var id: WidgetIdentifier { .weather }
     let columnSpan: Int
     var minimumWidth: CGFloat { WidgetMinimumWidth.regular }
-    var preferredHeight: CGFloat { WidgetHeight.standard }
 
     private let city = "Guangzhou"
     private let temperature = "31°"
     private let condition = "Mostly Clear"
+    private let currentSymbol = "cloud.sun"
     private let dailyRange = "H:33°  L:26°"
     private let hourly: [MockHourForecast] = [
         .init(hour: "12", symbol: "sun.max", temperature: "32°"),
@@ -40,45 +40,36 @@ struct WeatherWidget: DashboardWidget {
         }
     }
 
-    /// Two-column layout: current conditions beside the hourly strip.
+    /// Two-column layout, styled like the macOS weather widget:
+    /// city and current temperature on the left, condition and range
+    /// on the right, hourly strip along the bottom.
     private var wideLayout: some View {
-        HStack(alignment: .center, spacing: Spacing.large) {
-            VStack(alignment: .leading, spacing: Spacing.small) {
-                Text(city)
-                    .font(Typography.widgetTitle)
-                    .foregroundStyle(.secondary)
-                Text(temperature)
-                    .font(Typography.metricLarge)
-                Text(condition)
-                    .font(Typography.body)
-                Text(dailyRange)
-                    .font(Typography.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer(minLength: 0)
-            Divider()
-            HStack(spacing: Spacing.small) {
-                ForEach(hourly) { item in
-                    VStack(spacing: Spacing.small) {
-                        Text(item.hour)
-                            .font(Typography.caption)
-                            .foregroundStyle(.secondary)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .fixedSize()
-                        Image(systemName: item.symbol)
-                            .font(.system(size: 22))
-                            .foregroundStyle(.tint)
-                        Text(item.temperature)
-                            .font(Typography.caption)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .fixedSize()
-                    }
+        VStack(alignment: .leading, spacing: Spacing.medium) {
+            HStack(alignment: .top, spacing: Spacing.medium) {
+                VStack(alignment: .leading, spacing: Spacing.xs) {
+                    Text(city)
+                        .font(Typography.widgetTitle)
+                        .foregroundStyle(.secondary)
+                    Text(temperature)
+                        .font(Typography.temperatureLarge)
+                }
+                Spacer(minLength: 0)
+                VStack(alignment: .trailing, spacing: Spacing.xs) {
+                    Image(systemName: currentSymbol)
+                        .font(.system(size: 26))
+                        .foregroundStyle(.tint)
+                    Text(condition)
+                        .font(Typography.body)
+                    Text(dailyRange)
+                        .font(Typography.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
+            Divider()
+            hourlyStrip(itemCount: hourly.count)
+            Spacer(minLength: 0)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     /// One-column layout: current conditions above a shorter hourly strip.
@@ -100,27 +91,31 @@ struct WeatherWidget: DashboardWidget {
                     .font(Typography.metric)
             }
             Divider()
-            HStack(spacing: Spacing.small) {
-                ForEach(hourly.prefix(4)) { item in
-                    VStack(spacing: Spacing.xs) {
-                        Text(item.hour)
-                            .font(Typography.caption)
-                            .foregroundStyle(.secondary)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                        Image(systemName: item.symbol)
-                            .font(.system(size: 15))
-                            .foregroundStyle(.tint)
-                        Text(item.temperature)
-                            .font(Typography.caption)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-            }
+            hourlyStrip(itemCount: 4)
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    }
+
+    private func hourlyStrip(itemCount: Int) -> some View {
+        HStack(spacing: Spacing.small) {
+            ForEach(hourly.prefix(itemCount)) { item in
+                VStack(spacing: Spacing.xs) {
+                    Text(item.hour)
+                        .font(Typography.caption)
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                    Image(systemName: item.symbol)
+                        .font(.system(size: 17))
+                        .foregroundStyle(.tint)
+                    Text(item.temperature)
+                        .font(Typography.caption)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
     }
 }

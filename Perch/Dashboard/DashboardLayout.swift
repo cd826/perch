@@ -1,20 +1,28 @@
 import CoreGraphics
 
 /// Geometry rules for the grid and window (SPEC §7, §20).
+/// Rows are square by default, so window height derives from the
+/// column width rather than fixed constants.
 enum DashboardLayout {
     /// The default dashboard grid is 4 columns (SPEC §7.1).
     static let columnCount = 4
     /// Smallest comfortable width for a single grid column.
     static let minimumColumnWidth: CGFloat = 220
+    /// Column width the default window size targets.
+    static let defaultColumnWidth: CGFloat = 300
 
     static var minimumWindowWidth: CGFloat {
         windowWidth(forGridWidth: gridWidth(columnCount: columnCount, columnWidth: minimumColumnWidth))
     }
     static var defaultWindowWidth: CGFloat {
-        windowWidth(forGridWidth: gridWidth(columnCount: columnCount, columnWidth: 300))
+        windowWidth(forGridWidth: gridWidth(columnCount: columnCount, columnWidth: defaultColumnWidth))
     }
-    static var minimumWindowHeight: CGFloat { 480 }
-    static var defaultWindowHeight: CGFloat { 720 }
+    static var minimumWindowHeight: CGFloat {
+        minimumColumnWidth + Spacing.dashboardPadding * 2
+    }
+    static var defaultWindowHeight: CGFloat {
+        defaultColumnWidth + Spacing.dashboardPadding * 2 + 32  // + window title bar
+    }
 
     private static func gridWidth(columnCount: Int, columnWidth: CGFloat) -> CGFloat {
         CGFloat(columnCount) * columnWidth + CGFloat(columnCount - 1) * Spacing.gridGap
