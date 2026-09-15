@@ -137,24 +137,31 @@ struct WeatherWidget: DashboardWidget {
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
-    /// One-column layout for narrow cards: city and condition on the
-    /// left with the temperature on the right, then high/low arrows
-    /// and a three-hour strip.
+    /// One-column layout for narrow cards, stacked top to bottom:
+    /// city / icon+condition with temperature top-right / high-low
+    /// ranges / three-hour strip.
     private func compactLayout(_ snapshot: WeatherSnapshot) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline, spacing: Spacing.small) {
-                Text(snapshot.city)
-                    .font(Typography.widgetTitle)
-                    .lineLimit(1)
-                Text(snapshot.condition)
-                    .font(Typography.body)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .top, spacing: Spacing.small) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(snapshot.city)
+                        .font(Typography.widgetTitle)
+                        .lineLimit(1)
+                    HStack(spacing: 4) {
+                        Image(systemName: snapshot.symbolName)
+                            .font(.system(size: 13))
+                            .foregroundStyle(.primary)
+                        Text(snapshot.condition)
+                            .font(Typography.body)
+                    }
+                }
                 Spacer(minLength: 0)
                 Text("\(snapshot.temperature)°")
                     .font(Typography.temperatureCompact)
             }
             HStack(spacing: 8) {
-                rangeItem("arrow.up", snapshot.high)
-                rangeItem("arrow.down", snapshot.low)
+                rangeText("最高", snapshot.high)
+                rangeText("最低", snapshot.low)
             }
             hourlyStrip(itemCount: 3, from: snapshot.hourly)
         }
@@ -188,7 +195,7 @@ struct WeatherWidget: DashboardWidget {
         HStack(spacing: Spacing.small) {
             ForEach(entries) { entry in
                 VStack(spacing: 3) {
-                    Text(entry.hour)
+                    Text("\(entry.hour)时")
                         .font(Typography.caption)
                         .foregroundStyle(.secondary)
                         .monospacedDigit()
