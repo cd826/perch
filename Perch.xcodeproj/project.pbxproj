@@ -11,6 +11,7 @@
 		087DDD95779CB4EED0E65FDD /* TodoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0809DCED02F8D78BB3DAA40A /* TodoViewModel.swift */; };
 		0B02A862A8CF37E76673AC1A /* WidgetGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE426E811311DDDBAD60987 /* WidgetGrid.swift */; };
 		19011216E650F7E6E16BFC6B /* PerchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A273FDF288DDD755E9D97E33 /* PerchApp.swift */; };
+		1FA29EFF9382658700AED763 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8AF1B99736656067F89E244F /* AppIcon.icns */; };
 		36B49EDC618901AC32F3B044 /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB3C07B5864A91B76FAE50F /* Spacing.swift */; };
 		37B6811A4BD3533424174BE2 /* WidgetContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 427AB4A7A61643B6549459FD /* WidgetContainer.swift */; };
 		38C0843DD7FC14865E7A4152 /* ClockWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6D5E5827CD5D727398261F /* ClockWidget.swift */; };
@@ -56,6 +57,7 @@
 		6D6D5E5827CD5D727398261F /* ClockWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockWidget.swift; sourceTree = "<group>"; };
 		85A317DEDDEB9EB0545555D5 /* TodoWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoWidget.swift; sourceTree = "<group>"; };
 		86BE25EE453536FBDCC61280 /* DashboardLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardLayout.swift; sourceTree = "<group>"; };
+		8AF1B99736656067F89E244F /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		A273FDF288DDD755E9D97E33 /* PerchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerchApp.swift; sourceTree = "<group>"; };
 		A5A69ED0D808D4151DEFBF90 /* PerchSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerchSettingsView.swift; sourceTree = "<group>"; };
 		AF0E69663340C5323D1D6549 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
@@ -63,6 +65,7 @@
 		B9B5176505DE28765432C9FC /* WidgetSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSize.swift; sourceTree = "<group>"; };
 		C0D5083ED2EA9CA77CD69447 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C23AC04FB60497CB970AFED4 /* WindowConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowConfigurator.swift; sourceTree = "<group>"; };
+		CCE7F4A19505D3B665B3A097 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D41D4D3B908363F711572982 /* Perch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD4BD91BFE65D30938FD0F1C /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
 		E049EE4BB40BD9FB428A05A9 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
@@ -92,6 +95,7 @@
 		2C6F5851A6B9652C9F6BF58E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8AF1B99736656067F89E244F /* AppIcon.icns */,
 				C0D5083ED2EA9CA77CD69447 /* Assets.xcassets */,
 			);
 			path = Resources;
@@ -200,6 +204,7 @@
 		E32E753CE6364804D2CF49B3 /* Perch */ = {
 			isa = PBXGroup;
 			children = (
+				CCE7F4A19505D3B665B3A097 /* Info.plist */,
 				EEC16C9E619B957A56177B83 /* App */,
 				BA24DEAAE2B20E12C56327B6 /* Core */,
 				BFEE318FD8C33E79CA49A53C /* Dashboard */,
@@ -279,6 +284,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1FA29EFF9382658700AED763 /* AppIcon.icns in Resources */,
 				43419DBBFAA9A7474A23716E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -384,16 +390,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Perch 使用你的位置自动获取当地天气。";
-				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "Perch 在仪表盘上显示你的提醒事项待办。";
+				INFOPLIST_FILE = Perch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -472,16 +474,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Perch 使用你的位置自动获取当地天气。";
-				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "Perch 在仪表盘上显示你的提醒事项待办。";
+				INFOPLIST_FILE = Perch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

@@ -16,21 +16,23 @@ targets:
     platform: macOS
     sources:
       - path: Perch
+    info:
+      path: Perch/Info.plist
+      properties:
+        CFBundleDisplayName: Perch
+        CFBundleIconFile: AppIcon
+        LSApplicationCategoryType: public.app-category.productivity
+        NSRemindersFullAccessUsageDescription: "Perch 在仪表盘上显示你的提醒事项待办。"
+        NSLocationWhenInUseUsageDescription: "Perch 使用你的位置自动获取当地天气。"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.perch.Perch
         PRODUCT_NAME: Perch
         MARKETING_VERSION: 0.1.0
         CURRENT_PROJECT_VERSION: 1
-        GENERATE_INFOPLIST_FILE: true
-        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
-        INFOPLIST_KEY_NSRemindersFullAccessUsageDescription: "Perch 在仪表盘上显示你的提醒事项待办。"
-        INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Perch 使用你的位置自动获取当地天气。"
         CODE_SIGN_STYLE: Automatic
         CODE_SIGN_IDENTITY: "-"
         ENABLE_HARDENED_RUNTIME: true
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
 
 schemes:
   Perch:
