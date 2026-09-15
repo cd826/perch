@@ -22,7 +22,8 @@ struct DashboardView: View {
             }
             .padding(Spacing.dashboardPadding)
         }
-        .animation(.smooth(duration: 0.35), value: clockStyle)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea()
+        .animation(.smooth(duration: 0.35), value: clockStyle)
     }
 }
