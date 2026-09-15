@@ -1,10 +1,9 @@
 import CoreLocation
 import Foundation
-import WeatherKit
 
-/// Everything the weather card renders, decoupled from WeatherKit
-/// (SPEC §14.1, §16). `isFallback` marks demo data used when the
-/// WeatherKit service is unreachable.
+/// Everything the weather card renders, decoupled from the backend
+/// (SPEC §14.1, §16). Data comes from the free Open-Meteo API — no
+/// key, no developer account required.
 struct WeatherSnapshot: Equatable {
     struct HourEntry: Equatable, Identifiable {
         let id: Int
@@ -21,14 +20,12 @@ struct WeatherSnapshot: Equatable {
     let low: Int
     let hourly: [HourEntry]
     let fetchedAt: Date
-    let isFallback: Bool
 }
 
-/// WeatherService (SPEC §14, §17): WeatherKit behind this facade, a
+/// WeatherService (SPEC §14, §17): Open-Meteo behind this facade, a
 /// 30-minute cache, refresh on demand/activation, and graceful
 /// failure — the last good snapshot stays visible with its timestamp
-/// (SPEC §22). If WeatherKit itself is unavailable (no capability /
-/// signing) the card falls back to clearly-labelled demo data.
+/// (SPEC §22).
 @MainActor
 final class WeatherService: ObservableObject {
     static let shared = WeatherService()
@@ -38,9 +35,17 @@ final class WeatherService: ObservableObject {
     @Published private(set) var lastUpdated: Date?
     @Published private(set) var error: String?
 
-    private let weatherService = WeatherKit.WeatherService()
     private var currentRequest: (location: CLLocation, city: String)?
     private var isLoading = false
+
+    /// Bypasses the system proxy: Open-Meteo is directly reachable,
+    /// while proxied requests can hang (observed on this machine).
+    private static let directSession: URLSession = {
+        let configuration = URLSessionConfiguration.default
+        configuration.connectionProxyDictionary = [:]
+        configuration.timeoutIntervalForRequest = 20
+        return URLSession(configuration: configuration)
+    }()
 
     /// Fetches fresh data when the cache is older than the refresh
     /// interval or the target changed; `force` bypasses the interval.
@@ -62,113 +67,188 @@ final class WeatherService: ObservableObject {
 
     private func load(location: CLLocation, city: String) async {
         do {
-            let weather = try await withTimeout(seconds: 15) {
-                try await self.weatherService.weather(for: location)
+            let snapshot = try await withTimeout(seconds: 15) {
+                try await Self.fetchOpenMeteo(location: location, city: city)
             }
-            snapshot = Self.makeSnapshot(weather: weather, city: city)
+            self.snapshot = snapshot
             lastUpdated = Date()
             self.error = nil
         } catch {
-            // SPEC §17/§22: keep the last good data, surface the error.
-            self.error = Self.errorMessage(for: error)
-            if snapshot == nil {
-                snapshot = Self.demoSnapshot(city: city)
-            }
+            // SPEC §17/§22: no fresh data — surface the error and let
+            // the UI keep/replace whatever it showed before.
+            self.error = "天气数据获取失败：\(error.localizedDescription)"
         }
         isLoading = false
     }
 
-    // MARK: - Snapshot assembly
+    // MARK: - Open-Meteo
 
-    private static func makeSnapshot(weather: Weather, city: String) -> WeatherSnapshot {
-        let celsius = UnitTemperature.celsius
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH"
+    private static func fetchOpenMeteo(location: CLLocation, city: String) async throws -> WeatherSnapshot {
+        var components = URLComponents(string: "https://api.open-meteo.com/v1/forecast")!
+        components.queryItems = [
+            URLQueryItem(name: "latitude", value: String(format: "%.4f", location.coordinate.latitude)),
+            URLQueryItem(name: "longitude", value: String(format: "%.4f", location.coordinate.longitude)),
+            URLQueryItem(name: "current", value: "temperature_2m,weather_code"),
+            URLQueryItem(name: "hourly", value: "temperature_2m,weather_code"),
+            URLQueryItem(name: "daily", value: "temperature_2m_max,temperature_2m_min"),
+            URLQueryItem(name: "timezone", value: "auto"),
+            URLQueryItem(name: "forecast_days", value: "2"),
+        ]
 
-        let current = weather.currentWeather
-        let currentTemperature = Int(current.temperature.converted(to: celsius).value.rounded())
-
-        var high = currentTemperature
-        var low = currentTemperature
-        if let today = weather.dailyForecast.forecast.first {
-            high = Int(today.highTemperature.converted(to: celsius).value.rounded())
-            low = Int(today.lowTemperature.converted(to: celsius).value.rounded())
+        let (data, response) = try await Self.directSession.data(from: components.url!)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            let code = (response as? HTTPURLResponse)?.statusCode ?? -1
+            throw WeatherAPIError.badStatus(code)
         }
+        let payload = try JSONDecoder().decode(OpenMeteoResponse.self, from: data)
+        return try assemble(payload: payload, city: city)
+    }
 
+    private static func assemble(payload: OpenMeteoResponse, city: String) throws -> WeatherSnapshot {
+        let parser = ISOHourParser()
+        let now = Date()
+
+        // Hourly strip: the next 6 entries starting at (or after) now.
         var hourly: [WeatherSnapshot.HourEntry] = []
-        for (index, hour) in weather.hourlyForecast.forecast.prefix(6).enumerated() {
-            let temperature = Int(hour.temperature.converted(to: celsius).value.rounded())
-            let entry = WeatherSnapshot.HourEntry(
+        var started = false
+        var taken = 0
+        for (index, iso) in payload.hourly.time.enumerated()
+        where taken < 6 && index < payload.hourly.temperature2m.count {
+            guard let date = parser.date(iso) else { continue }
+            if !started {
+                if date >= now.addingTimeInterval(-1800) { started = true }
+                else { continue }
+            }
+            let code = index < payload.hourly.weatherCode.count ? payload.hourly.weatherCode[index] : 0
+            let temperature = index < payload.hourly.temperature2m.count
+                ? Int(payload.hourly.temperature2m[index].rounded()) : 0
+            let described = describe(code: code)
+            hourly.append(WeatherSnapshot.HourEntry(
                 id: index,
-                hour: formatter.string(from: hour.date),
-                symbolName: hour.symbolName,
+                hour: parser.hourLabel(iso),
+                symbolName: described.symbol,
                 temperature: temperature
-            )
-            hourly.append(entry)
+            ))
+            taken += 1
         }
+        guard taken > 0 else {
+            throw WeatherAPIError.missingData("逐小时预报为空")
+        }
+        let currentTemp = payload.current.temperature2m
+        let currentCode = payload.current.weatherCode
+
+        let currentDescribed = describe(code: currentCode)
+        var high = Int(payload.daily.temperature2mMax.first?.rounded() ?? Double(currentTemp))
+        var low = Int(payload.daily.temperature2mMin.first?.rounded() ?? Double(currentTemp))
+        if high < low { swap(&high, &low) }
 
         return WeatherSnapshot(
             city: city,
-            temperature: currentTemperature,
-            condition: conditionText(current.condition),
-            symbolName: current.symbolName,
+            temperature: Int(currentTemp.rounded()),
+            condition: currentDescribed.text,
+            symbolName: currentDescribed.symbol,
             high: high,
             low: low,
             hourly: hourly,
-            fetchedAt: Date(),
-            isFallback: false
+            fetchedAt: Date()
         )
     }
+}
 
-    private static func conditionText(_ condition: WeatherCondition) -> String {
-        switch condition {
-        case .clear, .sunShowers: return "晴"
-        case .mostlyClear: return "大致晴朗"
-        case .partlyCloudy: return "局部多云"
-        case .mostlyCloudy, .cloudy: return "多云"
-        case .drizzle, .freezingDrizzle: return "毛毛雨"
-        case .rain, .heavyRain, .freezingRain: return "雨"
-        case .isolatedThunderstorms, .scatteredThunderstorms, .thunderstorms, .strongStorms: return "雷暴"
-        case .snow, .heavySnow, .flurries, .sleet, .blowingSnow: return "雪"
-        case .foggy: return "雾"
-        case .haze, .blowingDust: return "霾"
-        case .windy, .breezy: return "大风"
-        case .hot: return "炎热"
-        case .frigid: return "严寒"
-        case .hail: return "冰雹"
-        case .hurricane, .tropicalStorm: return "风暴"
-        default: return condition.rawValue
+enum WeatherAPIError: LocalizedError {
+    case badStatus(Int)
+    case missingData(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .badStatus(let code): return "服务返回状态码 \(code)"
+        case .missingData(let detail): return detail
+        }
+    }
+}
+
+// MARK: - Open-Meteo payload
+
+private struct OpenMeteoResponse: Decodable {
+    struct Current: Decodable {
+        let temperature2m: Double
+        let weatherCode: Int
+
+        enum CodingKeys: String, CodingKey {
+            case temperature2m = "temperature_2m"
+            case weatherCode = "weather_code"
         }
     }
 
-    private static func errorMessage(for error: Error) -> String {
-        let description = error.localizedDescription
-        let lowered = description.lowercased()
-        if lowered.contains("401") || lowered.contains("forbidden") || lowered.contains("unauthorized") {
-            return "WeatherKit 服务未授权（需要在开发者账号中启用 WeatherKit）。"
+    struct Hourly: Decodable {
+        let time: [String]
+        let temperature2m: [Double]
+        let weatherCode: [Int]
+
+        enum CodingKeys: String, CodingKey {
+            case time
+            case temperature2m = "temperature_2m"
+            case weatherCode = "weather_code"
         }
-        return description
     }
 
-    /// Demo data shaped like the SPEC §16 example, used only while
-    /// WeatherKit is unavailable so the card stays meaningful.
-    private static func demoSnapshot(city: String) -> WeatherSnapshot {
-        let hours: [(String, String, Int)] = [
-            ("12", "sun.max", 32), ("13", "cloud.sun", 32), ("14", "cloud", 33),
-            ("15", "cloud", 31), ("16", "cloud", 29), ("17", "cloud.drizzle", 27),
-        ]
-        return WeatherSnapshot(
-            city: city,
-            temperature: 31,
-            condition: "Mostly Clear",
-            symbolName: "cloud.sun",
-            high: 33,
-            low: 26,
-            hourly: hours.enumerated().map { index, entry in
-                WeatherSnapshot.HourEntry(id: index, hour: entry.0, symbolName: entry.1, temperature: entry.2)
-            },
-            fetchedAt: Date(),
-            isFallback: true
-        )
+    struct Daily: Decodable {
+        let temperature2mMax: [Double]
+        let temperature2mMin: [Double]
+
+        enum CodingKeys: String, CodingKey {
+            case temperature2mMax = "temperature_2m_max"
+            case temperature2mMin = "temperature_2m_min"
+        }
+    }
+
+    let current: Current
+    let hourly: Hourly
+    let daily: Daily
+}
+
+/// Parses Open-Meteo's local-time ISO strings ("2026-09-15T17:00").
+private struct ISOHourParser {
+    private let formatter: DateFormatter
+
+    init() {
+        formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.isLenient = false
+    }
+
+    func date(_ iso: String) -> Date? {
+        formatter.date(from: iso)
+    }
+
+    func hourLabel(_ iso: String) -> String {
+        let parts = iso.split(separator: "T")
+        guard parts.count == 2 else { return "--" }
+        return String(parts[1].prefix(2))
+    }
+}
+
+// MARK: - WMO weather codes → text + SF Symbol
+
+func describe(code: Int) -> (text: String, symbol: String) {
+    switch code {
+    case 0: return ("晴", "sun.max")
+    case 1: return ("大致晴朗", "sun.max")
+    case 2: return ("局部多云", "cloud.sun")
+    case 3: return ("阴", "cloud")
+    case 45, 48: return ("雾", "cloud.fog")
+    case 51, 53, 55: return ("毛毛雨", "cloud.drizzle")
+    case 56, 57: return ("冻毛毛雨", "cloud.drizzle")
+    case 61: return ("小雨", "cloud.rain")
+    case 63: return ("中雨", "cloud.rain")
+    case 65: return ("大雨", "cloud.heavyrain")
+    case 66, 67: return ("冻雨", "cloud.rain")
+    case 71, 73, 75, 77: return ("雪", "snow")
+    case 80, 81, 82: return ("阵雨", "cloud.heavyrain")
+    case 85, 86: return ("阵雪", "snow")
+    case 95: return ("雷暴", "cloud.bolt.rain")
+    case 96, 99: return ("雷暴伴冰雹", "cloud.bolt.rain")
+    default: return ("未知", "cloud")
     }
 }

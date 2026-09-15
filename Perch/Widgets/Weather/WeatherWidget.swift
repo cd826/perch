@@ -130,11 +130,6 @@ struct WeatherWidget: DashboardWidget {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    if snapshot.isFallback {
-                        Text("演示数据")
-                            .font(Typography.caption)
-                            .foregroundStyle(.secondary)
-                    }
                 }
             }
             Divider()
@@ -161,11 +156,6 @@ struct WeatherWidget: DashboardWidget {
             }
             Divider()
             hourlyStrip(itemCount: 4, from: snapshot.hourly)
-            if snapshot.isFallback {
-                Text("演示数据")
-                    .font(Typography.caption)
-                    .foregroundStyle(.secondary)
-            }
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -220,8 +210,7 @@ struct WeatherWidget: DashboardWidget {
     private var accessibilityLabel: String {
         switch viewModel.state {
         case .loaded(let snapshot, _):
-            let fallback = snapshot.isFallback ? "（演示数据）" : ""
-            return "天气 \(snapshot.city)，\(snapshot.temperature) 度，\(snapshot.condition)\(fallback)"
+            return "天气 \(snapshot.city)，\(snapshot.temperature) 度，\(snapshot.condition)"
         case .needsLocationPermission:
             return "天气，需要定位权限"
         default:
