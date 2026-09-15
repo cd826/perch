@@ -192,13 +192,12 @@ struct WeatherWidget: DashboardWidget {
         }
     }
 
-    /// Hourly strip: equal-width columns, each left-aligned, so the
-    /// first hour lines up with the city name and the gaps between
-    /// columns stay consistent.
+    /// Hourly strip: equal-width columns, each centered, so the gaps
+    /// between hours stay consistent.
     private func hourlyStrip(_ entries: [WeatherSnapshot.HourEntry]) -> some View {
         HStack(spacing: 0) {
             ForEach(entries) { entry in
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .center, spacing: 3) {
                     Text("\(entry.hour)时")
                         .font(Typography.caption)
                         .foregroundStyle(.secondary)
@@ -212,7 +211,7 @@ struct WeatherWidget: DashboardWidget {
                         .monospacedDigit()
                         .lineLimit(1)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity)
             }
         }
     }
