@@ -179,7 +179,7 @@ private struct FlipColonView: View {
         }
         .frame(width: size.width)
         .foregroundStyle(Color(red: 1.0, green: 0.55, blue: 0.05))
-        .shadow(color: Color(red: 1.0, green: 0.55, blue: 0.05).opacity(active ? 0.8 : 0), radius: size.width * 0.25)
+        .shadow(color: Color(red: 1.0, green: 0.55, blue: 0.05).opacity(active ? 0.8 : 0), radius: size.width * 0.45)
         .opacity(active ? 1 : 0.4)
         .animation(.easeInOut(duration: 0.5), value: active)
     }
