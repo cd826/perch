@@ -6,8 +6,9 @@ import CoreGraphics
 enum DashboardLayout {
     /// The default dashboard grid is 4 columns (SPEC §7.1).
     static let columnCount = 4
-    /// Smallest comfortable width for a single grid column.
-    static let minimumColumnWidth: CGFloat = 220
+    /// Smallest comfortable width for a single grid column. Chosen so
+    /// the minimum window fits a 800pt-wide display exactly.
+    static let minimumColumnWidth: CGFloat = 176
     /// Column width the default window size targets.
     static let defaultColumnWidth: CGFloat = 300
 

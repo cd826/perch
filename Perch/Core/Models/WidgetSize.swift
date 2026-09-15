@@ -8,6 +8,6 @@ enum WidgetColumnSpan {
 
 /// Width presets for the narrowest widget shapes.
 enum WidgetMinimumWidth {
-    static let compact: CGFloat = 200
-    static let regular: CGFloat = 320
+    static let compact: CGFloat = 160
+    static let regular: CGFloat = 280
 }

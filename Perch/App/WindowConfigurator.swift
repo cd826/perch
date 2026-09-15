@@ -15,10 +15,12 @@ struct WindowConfigurator: NSViewRepresentable {
             guard let window = view.window else { return }
             window.setFrameAutosaveName(Self.frameAutosaveName)
             if !window.setFrameUsingName(Self.frameAutosaveName) {
-                window.setContentSize(NSSize(
-                    width: DashboardLayout.defaultWindowWidth,
-                    height: DashboardLayout.defaultWindowHeight
-                ))
+                // First launch: default size, clamped to the visible
+                // frame of the screen the window lands on.
+                let visible = window.screen?.visibleFrame
+                let width = min(DashboardLayout.defaultWindowWidth, visible?.width ?? .infinity)
+                let height = min(DashboardLayout.defaultWindowHeight, visible?.height ?? .infinity)
+                window.setContentSize(NSSize(width: width, height: height))
                 window.center()
             }
         }
