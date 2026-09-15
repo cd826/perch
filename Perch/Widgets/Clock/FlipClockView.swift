@@ -132,21 +132,38 @@ private struct FlipDigitView: View {
     }
 }
 
-/// One half of a flap card: near-black background, the digit clipped
-/// to this half, and the hairline seam on the top half's bottom edge.
+/// One half of a flap card. Dark scheme: near-black card, light digit
+/// (classic flip clock). Light scheme: light gray card, dark digit —
+/// both follow the environment like the rest of the dashboard.
 private struct HalfDigit: View {
     let text: String
     let half: CardHalf
     let cardSize: CGSize
 
+    @Environment(\.colorScheme) private var colorScheme
+
     private var halfHeight: CGFloat { cardSize.height / 2 }
+
+    private var cardColor: Color {
+        colorScheme == .dark
+            ? Color(red: 0.11, green: 0.11, blue: 0.12)
+            : Color(red: 0.93, green: 0.93, blue: 0.94)
+    }
+
+    private var digitColor: Color {
+        colorScheme == .dark ? Color(white: 0.8) : Color(white: 0.2)
+    }
+
+    private var seamColor: Color {
+        colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.12)
+    }
 
     var body: some View {
         ZStack {
-            Color(red: 0.11, green: 0.11, blue: 0.12)
+            cardColor
             Text(text)
                 .font(.system(size: cardSize.height * 0.78, weight: .semibold))
-                .foregroundStyle(Color(white: 0.8))
+                .foregroundStyle(digitColor)
                 .frame(width: cardSize.width, height: cardSize.height)
                 .frame(width: cardSize.width, height: halfHeight,
                        alignment: half == .top ? .top : .bottom)
@@ -155,7 +172,7 @@ private struct HalfDigit: View {
                 VStack {
                     Spacer(minLength: 0)
                     Rectangle()
-                        .fill(Color.white.opacity(0.1))
+                        .fill(seamColor)
                         .frame(height: 1)
                 }
             }
