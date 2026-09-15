@@ -132,9 +132,10 @@ private struct FlipDigitView: View {
     }
 }
 
-/// One half of a flap card. Dark scheme: near-black card, light digit
-/// (classic flip clock). Light scheme: light gray card, dark digit —
-/// both follow the environment like the rest of the dashboard.
+/// One half of a flap card. The top and bottom halves use different
+/// shading (light falls on the upper flap), separated by a seam of
+/// highlight + shadow — the detail that makes it read as a flip
+/// clock. Colors adapt to light/dark appearance.
 private struct HalfDigit: View {
     let text: String
     let half: CardHalf
@@ -144,23 +145,25 @@ private struct HalfDigit: View {
 
     private var halfHeight: CGFloat { cardSize.height / 2 }
 
-    private var cardColor: Color {
-        colorScheme == .dark
-            ? Color(red: 0.11, green: 0.11, blue: 0.12)
-            : Color(red: 0.93, green: 0.93, blue: 0.94)
+    // Upper flap catches light; lower flap sits in shadow.
+    private var cardGradient: LinearGradient {
+        let colors: [Color]
+        switch (colorScheme, half) {
+        case (.dark, .top): colors = [Color(red: 0.19, green: 0.19, blue: 0.20), Color(red: 0.15, green: 0.15, blue: 0.16)]
+        case (.dark, .bottom): colors = [Color(red: 0.13, green: 0.13, blue: 0.14), Color(red: 0.09, green: 0.09, blue: 0.10)]
+        case (_, .top): colors = [Color(red: 0.96, green: 0.96, blue: 0.97), Color(red: 0.89, green: 0.89, blue: 0.90)]
+        default: colors = [Color(red: 0.84, green: 0.84, blue: 0.85), Color(red: 0.78, green: 0.78, blue: 0.79)]
+        }
+        return LinearGradient(colors: colors, startPoint: .top, endPoint: .bottom)
     }
 
     private var digitColor: Color {
-        colorScheme == .dark ? Color(white: 0.8) : Color(white: 0.2)
-    }
-
-    private var seamColor: Color {
-        colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.12)
+        colorScheme == .dark ? Color(white: 0.82) : Color(white: 0.15)
     }
 
     var body: some View {
         ZStack {
-            cardColor
+            cardGradient
             Text(text)
                 .font(.system(size: cardSize.height * 0.78, weight: .semibold))
                 .foregroundStyle(digitColor)
@@ -169,15 +172,27 @@ private struct HalfDigit: View {
                        alignment: half == .top ? .top : .bottom)
                 .clipped()
             if half == .top {
-                VStack {
+                VStack(spacing: 0) {
                     Spacer(minLength: 0)
+                    // 板缘高光 + 板间深缝：flip clock 的标志性细节
                     Rectangle()
-                        .fill(seamColor)
+                        .fill(seamHighlight)
                         .frame(height: 1)
+                    Rectangle()
+                        .fill(seamShadow)
+                        .frame(height: 2)
                 }
             }
         }
         .frame(width: cardSize.width, height: halfHeight)
+    }
+
+    private var seamHighlight: Color {
+        colorScheme == .dark ? Color.white.opacity(0.16) : Color.white.opacity(0.7)
+    }
+
+    private var seamShadow: Color {
+        colorScheme == .dark ? Color.black.opacity(0.65) : Color.black.opacity(0.28)
     }
 }
 
