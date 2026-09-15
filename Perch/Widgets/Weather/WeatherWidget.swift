@@ -26,7 +26,7 @@ struct WeatherWidget: DashboardWidget {
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
         }
-        .scrollIndicators(.hidden)
+        .scrollIndicators(.never)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
@@ -36,11 +36,9 @@ struct WeatherWidget: DashboardWidget {
 
     @ViewBuilder private var header: some View {
         switch viewModel.state {
-        case .loaded(let snapshot, _):
-            Text(snapshot.city)
-                .font(Typography.widgetTitle)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+        // Loaded states render the city inside their own layout.
+        case .loaded, .failed:
+            EmptyView()
         default:
             Text("天气")
                 .font(Typography.widgetTitle)
@@ -109,79 +107,99 @@ struct WeatherWidget: DashboardWidget {
 
     // MARK: - Data layouts
 
-    /// Two-column layout, styled like the macOS weather widget:
-    /// city and current temperature on the left, condition and range
-    /// on the right, hourly strip along the bottom.
+    /// Two-column layout modeled on the macOS weather widget: city,
+    /// condition and range on the left, oversized temperature on the
+    /// right, a three-row hourly strip along the bottom.
     private func wideLayout(_ snapshot: WeatherSnapshot) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.small) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top, spacing: Spacing.medium) {
-                VStack(alignment: .leading, spacing: Spacing.xs) {
-                    Text("\(snapshot.temperature)°")
-                        .font(Typography.temperatureLarge)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(snapshot.city)
+                        .font(Typography.widgetTitle)
+                    HStack(spacing: 6) {
+                        Image(systemName: snapshot.symbolName)
+                            .font(.system(size: 15))
+                            .foregroundStyle(.primary)
+                        Text(snapshot.condition)
+                            .font(Typography.body)
+                    }
+                    HStack(spacing: 6) {
+                        rangeText("最高", snapshot.high)
+                        rangeText("最低", snapshot.low)
+                    }
                 }
                 Spacer(minLength: 0)
-                VStack(alignment: .trailing, spacing: 2) {
-                    Image(systemName: snapshot.symbolName)
-                        .font(.system(size: 15))
-                        .foregroundStyle(.tint)
-                    Text(snapshot.condition)
-                        .font(Typography.caption)
-                        .lineLimit(1)
-                    HStack(spacing: Spacing.xs) {
-                        Text("H:\(snapshot.high)°")
-                        Text("L:\(snapshot.low)°")
-                    }
-                    .font(Typography.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                }
+                Text("\(snapshot.temperature)°")
+                    .font(Typography.temperatureLarge)
             }
-            Divider()
             hourlyStrip(Array(snapshot.hourly.prefix(6)))
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
-    /// One-column layout for narrow cards: current conditions above a
-    /// shorter hourly strip; the condition line is dropped — it does
-    /// not fit a 1-column card.
+    /// One-column layout for narrow cards: city and condition on the
+    /// left with the temperature on the right, then high/low arrows
+    /// and a three-hour strip.
     private func compactLayout(_ snapshot: WeatherSnapshot) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.small) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline, spacing: Spacing.small) {
+                Text(snapshot.city)
+                    .font(Typography.widgetTitle)
+                    .lineLimit(1)
+                Text(snapshot.condition)
+                    .font(Typography.body)
+                Spacer(minLength: 0)
                 Text("\(snapshot.temperature)°")
                     .font(Typography.temperatureCompact)
-                Spacer(minLength: Spacing.small)
-                Text("H:\(snapshot.high)° L:\(snapshot.low)°")
-                    .font(Typography.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
             }
-            Divider()
-            hourlyStrip(itemCount: 4, from: snapshot.hourly)
+            HStack(spacing: 8) {
+                rangeItem("arrow.up", snapshot.high)
+                rangeItem("arrow.down", snapshot.low)
+            }
+            hourlyStrip(itemCount: 3, from: snapshot.hourly)
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
+    }
+
+    private func rangeItem(_ symbol: String, _ value: Int) -> some View {
+        HStack(spacing: 2) {
+            Image(systemName: symbol)
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(.secondary)
+            Text("\(value)°")
+                .font(Typography.caption)
+                .monospacedDigit()
+        }
+    }
+
+    /// "最高33°"-style readout used beside the current temperature.
+    private func rangeText(_ label: String, _ value: Int) -> some View {
+        HStack(spacing: 2) {
+            Text(label)
+                .font(Typography.caption)
+                .foregroundStyle(.secondary)
+            Text("\(value)°")
+                .font(Typography.caption)
+                .monospacedDigit()
+        }
     }
 
     private func hourlyStrip(_ entries: [WeatherSnapshot.HourEntry]) -> some View {
         HStack(spacing: Spacing.small) {
             ForEach(entries) { entry in
-                VStack(spacing: 2) {
+                VStack(spacing: 3) {
                     Text(entry.hour)
                         .font(Typography.caption)
                         .foregroundStyle(.secondary)
                         .monospacedDigit()
                         .lineLimit(1)
-                    HStack(spacing: 4) {
-                        Image(systemName: entry.symbolName)
-                            .font(.system(size: 12))
-                            .foregroundStyle(.tint)
-                        Text("\(entry.temperature)°")
-                            .font(Typography.caption)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                    }
+                    Image(systemName: entry.symbolName)
+                        .font(.system(size: 14))
+                        .foregroundStyle(.primary)
+                    Text("\(entry.temperature)°")
+                        .font(Typography.caption)
+                        .monospacedDigit()
+                        .lineLimit(1)
                 }
                 .frame(maxWidth: .infinity)
             }
