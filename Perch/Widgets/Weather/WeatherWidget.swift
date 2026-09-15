@@ -72,23 +72,24 @@ struct WeatherWidget: DashboardWidget {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
-    /// One-column layout: current conditions above a shorter hourly strip.
+    /// One-column layout for narrow cards: city, temperature beside
+    /// the daily range (the condition line is dropped — it does not
+    /// fit a 1-column card), then a shorter hourly strip.
     private var compactLayout: some View {
-        VStack(alignment: .leading, spacing: Spacing.medium) {
-            HStack(alignment: .center, spacing: Spacing.medium) {
-                VStack(alignment: .leading, spacing: Spacing.xs) {
-                    Text(city)
-                        .font(Typography.widgetTitle)
-                        .foregroundStyle(.secondary)
-                    Text(condition)
-                        .font(Typography.body)
-                    Text(dailyRange)
-                        .font(Typography.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer(minLength: 0)
+        VStack(alignment: .leading, spacing: Spacing.small) {
+            Text(city)
+                .font(Typography.widgetTitle)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            HStack(alignment: .firstTextBaseline, spacing: Spacing.small) {
                 Text(temperature)
-                    .font(Typography.metric)
+                    .font(Typography.temperatureCompact)
+                Spacer(minLength: Spacing.small)
+                Text(dailyRange)
+                    .font(Typography.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             Divider()
             hourlyStrip(itemCount: 4)

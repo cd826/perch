@@ -4,6 +4,8 @@ import SwiftUI
 enum Typography {
     /// Hero temperature readout (weather widget).
     static let temperatureLarge = Font.system(size: 64, weight: .medium, design: .rounded)
+    /// Temperature in narrow 1-column cards.
+    static let temperatureCompact = Font.system(size: 28, weight: .medium, design: .rounded)
     /// Secondary numeric readouts (todo count, compact temperature).
     static let metric = Font.system(size: 40, weight: .medium, design: .rounded)
     /// Card titles (list name, city).
