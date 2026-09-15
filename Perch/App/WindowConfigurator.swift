@@ -13,6 +13,13 @@ struct WindowConfigurator: NSViewRepresentable {
         let view = NSView()
         DispatchQueue.main.async {
             guard let window = view.window else { return }
+            // Ambient-app chrome: no title bar, but the traffic-light
+            // buttons stay, floating over the full-size content.
+            window.titleVisibility = .hidden
+            window.titlebarAppearsTransparent = true
+            window.styleMask.insert(.fullSizeContentView)
+            window.isMovableByWindowBackground = true
+
             window.setFrameAutosaveName(Self.frameAutosaveName)
             if !window.setFrameUsingName(Self.frameAutosaveName) {
                 // First launch: default size, clamped to the visible

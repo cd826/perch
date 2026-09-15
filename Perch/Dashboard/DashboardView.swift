@@ -20,7 +20,12 @@ struct DashboardView: View {
                     WidgetContainer(widget: widget)
                 }
             }
-            .padding(Spacing.dashboardPadding)
+            .padding(EdgeInsets(
+                top: Spacing.dashboardPadding + 10,  // clearance for the floating traffic lights
+                leading: Spacing.dashboardPadding,
+                bottom: Spacing.dashboardPadding,
+                trailing: Spacing.dashboardPadding
+            ))
         }
         .animation(.smooth(duration: 0.35), value: clockStyle)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
