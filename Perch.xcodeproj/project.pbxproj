@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0048F2C1C4E78469B5F4D218 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39CF0B5F522CFB302E0361E /* AppDelegate.swift */; };
 		01B23A343234A8CEF923448F /* DashboardCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09A9266FEDB78BAD64775B52 /* DashboardCard.swift */; };
 		087DDD95779CB4EED0E65FDD /* TodoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0809DCED02F8D78BB3DAA40A /* TodoViewModel.swift */; };
 		0B02A862A8CF37E76673AC1A /* WidgetGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE426E811311DDDBAD60987 /* WidgetGrid.swift */; };
@@ -70,6 +71,7 @@
 		DD4BD91BFE65D30938FD0F1C /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
 		E049EE4BB40BD9FB428A05A9 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		F1A1E2475A66E34F8042EAA4 /* FlipClockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlipClockView.swift; sourceTree = "<group>"; };
+		F39CF0B5F522CFB302E0361E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FF1CC1F048DC7600EBDFB532 /* Appearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Appearance.swift; sourceTree = "<group>"; };
 		FFEE536C3209FEE236EBA2EF /* AnalogClockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalogClockView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -218,6 +220,7 @@
 		EEC16C9E619B957A56177B83 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				F39CF0B5F522CFB302E0361E /* AppDelegate.swift */,
 				A273FDF288DDD755E9D97E33 /* PerchApp.swift */,
 				A5A69ED0D808D4151DEFBF90 /* PerchSettingsView.swift */,
 				C23AC04FB60497CB970AFED4 /* WindowConfigurator.swift */,
@@ -298,6 +301,7 @@
 			files = (
 				B5905AC192840F4C5548F77E /* AnalogClockView.swift in Sources */,
 				B63EA4DF4E472F8C41B0D606 /* AppAppearance.swift in Sources */,
+				0048F2C1C4E78469B5F4D218 /* AppDelegate.swift in Sources */,
 				60F5004A2D259BBFF39C9B66 /* Appearance.swift in Sources */,
 				B7A564E86FC46E8EE44038A1 /* ClockStyle.swift in Sources */,
 				38C0843DD7FC14865E7A4152 /* ClockWidget.swift in Sources */,

@@ -2,6 +2,7 @@ import SwiftUI
 
 @main
 struct PerchApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @AppStorage(ConfigurationStore.appearanceKey) private var appearance: AppAppearance = .system
 
     var body: some Scene {

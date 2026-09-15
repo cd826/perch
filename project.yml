@@ -21,6 +21,7 @@ targets:
       properties:
         CFBundleDisplayName: Perch
         CFBundleIconFile: AppIcon
+        LSUIElement: true
         LSApplicationCategoryType: public.app-category.productivity
         NSRemindersFullAccessUsageDescription: "Perch 在仪表盘上显示你的提醒事项待办。"
         NSLocationWhenInUseUsageDescription: "Perch 使用你的位置自动获取当地天气。"

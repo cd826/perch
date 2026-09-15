@@ -8,6 +8,7 @@ struct PerchSettingsView: View {
     @AppStorage(ConfigurationStore.appearanceKey) private var appearance: AppAppearance = .system
     @ObservedObject private var reminderService = ReminderService.shared
     @ObservedObject private var locationService = LocationService.shared
+    @Environment(\.openSettings) private var openSettings
 
     @State private var cityDraft = ""
 
@@ -44,7 +45,17 @@ struct PerchSettingsView: View {
         .formStyle(.grouped)
         .frame(width: 400, height: 620)
         .preferredColorScheme(appearance.colorScheme)
-        .onAppear { cityDraft = locationService.manualCity }
+        .onAppear {
+            cityDraft = locationService.manualCity
+            // Menu-bar apps have no app menu: the settings window is
+            // opened from the status item's menu via this notification.
+            NotificationCenter.default.addObserver(
+                forName: AppDelegate.openSettingsNotification,
+                object: nil, queue: .main
+            ) { _ in
+                openSettings()
+            }
+        }
     }
 
     // MARK: - Todo

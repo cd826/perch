@@ -24,6 +24,8 @@
 	<string>1</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
+	<key>LSUIElement</key>
+	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Perch 使用你的位置自动获取当地天气。</string>
 	<key>NSRemindersFullAccessUsageDescription</key>
