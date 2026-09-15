@@ -94,7 +94,7 @@ struct WeatherWidget: DashboardWidget {
 
         case .loaded(let snapshot, let staleNotice):
             let isWide = columnSpan >= WidgetColumnSpan.double
-            VStack(alignment: .leading, spacing: Spacing.small) {
+            VStack(alignment: .leading, spacing: 6) {
                 if let staleNotice {
                     Text(staleNotice)
                         .font(Typography.caption)
@@ -148,7 +148,7 @@ struct WeatherWidget: DashboardWidget {
     /// text-style high/low rows. Sizes chosen so the hourly strip's
     /// temperature row stays visible in the square card.
     private func compactTop(_ snapshot: WeatherSnapshot) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 3) {
             HStack(alignment: .top, spacing: Spacing.small) {
                 Text(snapshot.city)
                     .font(Typography.widgetTitle)
@@ -194,7 +194,7 @@ struct WeatherWidget: DashboardWidget {
     private func hourlyStrip(_ entries: [WeatherSnapshot.HourEntry]) -> some View {
         HStack(spacing: 0) {
             ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
-                VStack(alignment: .center, spacing: 3) {
+                VStack(alignment: .center, spacing: 2) {
                     Text("\(entry.hour)时")
                         .font(Typography.caption)
                         .foregroundStyle(.secondary)
@@ -202,9 +202,9 @@ struct WeatherWidget: DashboardWidget {
                         .lineLimit(1)
                         .fixedSize()
                     Image(systemName: entry.symbolName)
-                        .font(.system(size: 15))
+                        .font(.system(size: 14))
                         .foregroundStyle(.primary)
-                        .frame(width: 22)
+                        .frame(width: 20)
                     Text("\(entry.temperature)°")
                         .font(Typography.caption)
                         .monospacedDigit()
