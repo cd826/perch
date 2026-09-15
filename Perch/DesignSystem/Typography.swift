@@ -2,8 +2,8 @@ import SwiftUI
 
 /// Shared type scale for the dashboard (SPEC §18, §2.2 glanceable).
 enum Typography {
-    /// Hero temperature readout (weather widget).
-    static let temperatureLarge = Font.system(size: 44, weight: .medium, design: .rounded)
+    /// Hero temperature readout (weather widget, wide layout).
+    static let temperatureLarge = Font.system(size: 36, weight: .medium, design: .rounded)
     /// Temperature in narrow 1-column cards.
     static let temperatureCompact = Font.system(size: 28, weight: .medium, design: .rounded)
     /// Secondary numeric readouts (todo count, compact temperature).

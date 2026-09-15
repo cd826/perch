@@ -17,11 +17,16 @@ struct WeatherWidget: DashboardWidget {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.medium) {
-            header
-            detail
-            Spacer(minLength: 0)
+        ScrollView(.vertical) {
+            VStack(alignment: .leading, spacing: Spacing.small) {
+                header
+                // Compressible body: the card must never stretch beyond
+                // its square row, whatever the content's minimum height.
+                detail
+            }
+            .frame(maxWidth: .infinity, alignment: .topLeading)
         }
+        .scrollIndicators(.hidden)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
@@ -115,12 +120,12 @@ struct WeatherWidget: DashboardWidget {
                         .font(Typography.temperatureLarge)
                 }
                 Spacer(minLength: 0)
-                VStack(alignment: .trailing, spacing: Spacing.xs) {
+                VStack(alignment: .trailing, spacing: 2) {
                     Image(systemName: snapshot.symbolName)
-                        .font(.system(size: 20))
+                        .font(.system(size: 15))
                         .foregroundStyle(.tint)
                     Text(snapshot.condition)
-                        .font(Typography.body)
+                        .font(Typography.caption)
                         .lineLimit(1)
                     HStack(spacing: Spacing.xs) {
                         Text("H:\(snapshot.high)°")
@@ -134,9 +139,8 @@ struct WeatherWidget: DashboardWidget {
             }
             Divider()
             hourlyStrip(Array(snapshot.hourly.prefix(6)))
-            Spacer(minLength: 0)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
     /// One-column layout for narrow cards: current conditions above a
@@ -156,27 +160,28 @@ struct WeatherWidget: DashboardWidget {
             }
             Divider()
             hourlyStrip(itemCount: 4, from: snapshot.hourly)
-            Spacer(minLength: 0)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
     private func hourlyStrip(_ entries: [WeatherSnapshot.HourEntry]) -> some View {
         HStack(spacing: Spacing.small) {
             ForEach(entries) { entry in
-                VStack(spacing: Spacing.xs) {
+                VStack(spacing: 2) {
                     Text(entry.hour)
                         .font(Typography.caption)
                         .foregroundStyle(.secondary)
                         .monospacedDigit()
                         .lineLimit(1)
-                    Image(systemName: entry.symbolName)
-                        .font(.system(size: 15))
-                        .foregroundStyle(.tint)
-                    Text("\(entry.temperature)°")
-                        .font(Typography.caption)
-                        .monospacedDigit()
-                        .lineLimit(1)
+                    HStack(spacing: 4) {
+                        Image(systemName: entry.symbolName)
+                            .font(.system(size: 12))
+                            .foregroundStyle(.tint)
+                        Text("\(entry.temperature)°")
+                            .font(Typography.caption)
+                            .monospacedDigit()
+                            .lineLimit(1)
+                    }
                 }
                 .frame(maxWidth: .infinity)
             }
