@@ -12,10 +12,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        item.button?.image = NSImage(
-            systemSymbolName: "clock.fill",
-            accessibilityDescription: "Perch"
-        )
+        item.button?.image = Self.menuBarCatImage()
 
         let menu = NSMenu()
         let toggle = NSMenuItem(
@@ -63,5 +60,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var dashboardWindow: NSWindow? {
         WindowConfigurator.dashboardWindow
+    }
+
+    /// The menu-bar rendition of the app icon (the moonlit cat),
+    /// scaled to status-bar size and kept in color.
+    private static func menuBarCatImage() -> NSImage {
+        let target = NSSize(width: 18, height: 18)
+        let source = NSApp.applicationIconImage
+        guard let source else { return NSImage(
+            systemSymbolName: "clock.fill",
+            accessibilityDescription: "Perch") ?? NSImage() }
+        let image = NSImage(size: target)
+        image.lockFocus()
+        source.draw(in: NSRect(origin: .zero, size: target),
+                     from: .zero,
+                     operation: .sourceOver,
+                     fraction: 1.0)
+        image.unlockFocus()
+        image.isTemplate = false  // keep the cat's colors
+        return image
     }
 }
