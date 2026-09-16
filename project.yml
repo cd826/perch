@@ -21,6 +21,8 @@ targets:
       properties:
         CFBundleDisplayName: Perch
         CFBundleIconFile: AppIcon
+        CFBundleShortVersionString: 0.2.0
+        CFBundleVersion: 2
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.productivity
         NSRemindersFullAccessUsageDescription: "Perch 在仪表盘上显示你的提醒事项待办。"
@@ -29,8 +31,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.perch.Perch
         PRODUCT_NAME: Perch
-        MARKETING_VERSION: 0.1.0
-        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 0.2.0
+        CURRENT_PROJECT_VERSION: 2
         CODE_SIGN_STYLE: Automatic
         CODE_SIGN_IDENTITY: "-"
         ENABLE_HARDENED_RUNTIME: true
