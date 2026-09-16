@@ -1,3 +1,4 @@
+import AppKit
 import Combine
 import CoreLocation
 import Foundation
@@ -22,6 +23,7 @@ final class WeatherViewModel: ObservableObject {
     private let weatherService: WeatherService
     private var cancellables: Set<AnyCancellable> = []
     private var recomputeScheduled = false
+    private var refreshTimer: Timer?
 
     init(locationService: LocationService = .shared,
          weatherService: WeatherService = .shared) {
@@ -40,6 +42,28 @@ final class WeatherViewModel: ObservableObject {
             forName: NSNotification.Name("PerchWeatherRefreshRequested"), object: nil, queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.refreshNow() }
+        }
+
+        // SPEC §17: refresh periodically and when the application
+        // becomes active. The dashboard is a resident app that runs
+        // for days, so also re-check after system wake (data is stale
+        // every morning otherwise). All paths funnel through
+        // recompute → refreshIfStale, whose 30-minute cache keeps
+        // actual network requests sparse (SPEC: no continuous
+        // requests); a failed fetch leaves lastUpdated old, so the
+        // next check retries on its own.
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.scheduleRecompute() }
+        }
+        NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.scheduleRecompute() }
+        }
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.scheduleRecompute() }
         }
 
         locationService.resolve()
