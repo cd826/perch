@@ -22,7 +22,7 @@ targets:
         CFBundleDisplayName: Perch
         CFBundleIconFile: AppIcon
         CFBundleShortVersionString: 0.2.0
-        CFBundleVersion: 2
+        CFBundleVersion: "2"
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.productivity
         NSRemindersFullAccessUsageDescription: "Perch 在仪表盘上显示你的提醒事项待办。"
